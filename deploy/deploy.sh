@@ -58,7 +58,7 @@ gzip -9 $PACKAGE_MAN_DIR/$PACKAGE_NAME.1
 
 cd $BUILD_DIR
 
-/usr/lib/x86_64-linux-gnu/qt5/bin/qmake -set MOBUCO_VERSION $BUILD_VERSION $SOURCE_DIR
+/usr/lib/x86_64-linux-gnu/qt5/bin/qmake $SOURCE_DIR
 make -j5 install INSTALL_ROOT=$PACKAGE_DIR
 
 fakeroot dpkg-deb --build $PACKAGE_DIR
