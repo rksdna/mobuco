@@ -1,0 +1,11 @@
+Source: mobuco
+Package: mobuco
+Version: __VERSION__
+Section: misc
+Maintainer: Andrey Skrypka <rksdna@mail.ru>
+Homepage: http:/www.kovar.ru/
+Priority: extra
+Architecture: amd64
+Depends: libc6-dev
+Description: Special package.
+ No description.
