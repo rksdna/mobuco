@@ -3,19 +3,19 @@
 set -e
 
 if [ ! -d "$1" ] || [ ! -d "$2" ] ; then
-        echo "\n\tUsage: $0 <Source directory> <Target directory>\n\t\tSource directory must contains project file\n"
-        exit 1;
+    echo "\n\tUsage: $0 <Source directory> <Target directory>\n\t\tSource directory must contains project file\n"
+    exit 1;
 fi
 
 SOURCE_DIR=$(readlink -f $1)
 TARGET_DIR=$(readlink -f $2)
 BUILD_DIR=$(mktemp -d -p /tmp)
 
-BUILD_VERSION=$(git rev-list --count master)
-BUILD_DATE=$(date -R)
+DEPLOY_VERSION=1.$(git rev-list --count master)
+DEPLOY_DATE=$(date -R)
 
 PACKAGE_NAME=$(sed -n 's/^Package: //p' $SOURCE_DIR/deploy/control)
-PACKAGE_VERSION=$BUILD_VERSION
+PACKAGE_VERSION=$DEPLOY_VERSION
 PACKAGE_ARCHITECTURE=$(sed -n 's/^Architecture: //p' $SOURCE_DIR/deploy/control)
 
 PACKAGE=$PACKAGE_NAME'_'$PACKAGE_VERSION'_'$PACKAGE_ARCHITECTURE
@@ -29,8 +29,8 @@ DEBIAN_DIR=$PACKAGE_DIR/DEBIAN
 echo "Package: $PACKAGE"
 echo "Source: $SOURCE_DIR"
 echo "Target: $TARGET_DIR"
-echo "Version: $BUILD_VERSION"
-echo "Date: $BUILD_DATE"
+echo "Version: $DEPLOY_VERSION"
+echo "Date: $DEPLOY_DATE"
 echo
 
 mkdir -p $PACKAGE_DIR
@@ -44,13 +44,19 @@ install -m 644 -p $SOURCE_DIR/deploy/copyright $PACKAGE_DOC_DIR
 install -m 644 -p $SOURCE_DIR/deploy/changelog $PACKAGE_DOC_DIR
 install -m 644 -p $SOURCE_DIR/deploy/manpage $PACKAGE_MAN_DIR/$PACKAGE_NAME.1
 
-sed  -i -e "s/__VERSION__/$BUILD_VERSION/g" $DEBIAN_DIR/control
+echo "-- control --"
+sed  -i -e "s/__VERSION__/$DEPLOY_VERSION/g" $DEBIAN_DIR/control
 cat $DEBIAN_DIR/control
 echo
 
-sed  -i -e "s/__VERSION__/$BUILD_VERSION/g" $PACKAGE_DOC_DIR/changelog
-sed  -i -e "s/__DATE__/$BUILD_DATE/g" $PACKAGE_DOC_DIR/changelog
+echo "-- changelog --"
+sed  -i -e "s/__VERSION__/$DEPLOY_VERSION/g" $PACKAGE_DOC_DIR/changelog
+sed  -i -e "s/__DATE__/$DEPLOY_DATE/g" $PACKAGE_DOC_DIR/changelog
 cat $PACKAGE_DOC_DIR/changelog
+echo
+
+echo "-- copyright --"
+cat $PACKAGE_DOC_DIR/copyright
 echo
 
 gzip -9 $PACKAGE_DOC_DIR/changelog
@@ -58,7 +64,7 @@ gzip -9 $PACKAGE_MAN_DIR/$PACKAGE_NAME.1
 
 cd $BUILD_DIR
 
-/usr/lib/x86_64-linux-gnu/qt5/bin/qmake $SOURCE_DIR
+/usr/lib/x86_64-linux-gnu/qt5/bin/qmake "DEPLOY_DATE=$DEPLOY_DATE" "DEPLOY_VERSION=$DEPLOY_VERSION" $SOURCE_DIR
 make -j5 install INSTALL_ROOT=$PACKAGE_DIR
 
 fakeroot dpkg-deb --build $PACKAGE_DIR

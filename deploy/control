@@ -3,7 +3,8 @@ Package: mobuco
 Version: __VERSION__
 Section: misc
 Maintainer: Andrey Skrypka <rksdna@mail.ru>
-Homepage: http:/www.kovar.ru/
+Installed-Size: 10
+Homepage: http:/www.mobuco.com
 Priority: extra
 Architecture: amd64
 Depends: libc6-dev

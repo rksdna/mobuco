@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QDateTime>
 #include <QTranslator>
 #include <QLibraryInfo>
 #include <QApplication>
@@ -8,26 +9,30 @@ int main(int argc, char *argv[])
 {
     QApplication application(argc, argv);
 
-    application.setApplicationName(MOBUCO_NAME);
-    application.setApplicationVersion(MOBUCO_VERSION);
+    application.setApplicationName(DEPLOY_NAME);
+    application.setApplicationVersion(DEPLOY_VERSION);
+    application.setOrganizationDomain(DEPLOY_DOMAIN);
+    application.setOrganizationName(DEPLOY_ORGANIZATION);
 
-    qDebug() << MOBUCO_NAME;
-    qDebug() << MOBUCO_VERSION;
-    qDebug() << MOBUCO_BIN_FILE;
-    qDebug() << MOBUCO_BIN_DIR;
-    qDebug() << MOBUCO_DATA_DIR;
+    qDebug() << DEPLOY_NAME;
+    qDebug() << DEPLOY_DOMAIN;
+    qDebug() << DEPLOY_ORGANIZATION;
+    qDebug() << DEPLOY_BIN_DIR;
+    qDebug() << DEPLOY_DATA_DIR;
+    qDebug() << DEPLOY_VERSION;
+    qDebug() << DEPLOY_DATE;
 
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     application.installTranslator(&qtTranslator);
 
-    QTranslator transaltor;
+    QTranslator appTranslator;
 #ifdef QT_DEBUG
-    transaltor.load("tr_" + QLocale::system().name());
+    appTranslator.load("tr_" + QLocale::system().name());
 #else
-    transaltor.load("tr_" + QLocale::system().name(), MOBUCO_DATA_DIR);
+    appTranslator.load("tr_" + QLocale::system().name(), DEPLOY_DATA_DIR);
 #endif
-    application.installTranslator(&transaltor);
+    application.installTranslator(&appTranslator);
 
     MainWindow window;
     window.show();

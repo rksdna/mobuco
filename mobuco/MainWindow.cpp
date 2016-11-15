@@ -7,7 +7,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle(QApplication::instance()->applicationName());
+    setWindowTitle(qApp->applicationDisplayName());
 
     QMenu * const fileMenu = menuBar()->addMenu(tr("&File"));
     QAction * const closeAction = fileMenu->addAction(tr("E&xit"));

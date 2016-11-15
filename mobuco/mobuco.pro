@@ -5,8 +5,8 @@ QT += core gui widgets
 
 include(../translations/translations.pri)
 
-TARGET = $$MOBUCO_BIN_FILE
-target.path = $$MOBUCO_BIN_DIR
+TARGET = $$DEPLOY_TARGET
+target.path = $$DEPLOY_BIN_DIR
 
 SOURCES += \
     main.cpp \
