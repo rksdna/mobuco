@@ -7,3 +7,4 @@ OutputStream::~OutputStream()
 InputStream::~InputStream()
 {
 }
+

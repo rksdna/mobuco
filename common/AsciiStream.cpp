@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QString>
 #include "AsciiStream.h"
 
@@ -32,6 +33,20 @@ void AsciiStream::writeEnd()
 QByteArray AsciiStream::data() const
 {
     return m_data;
+}
+
+void AsciiStream::setData(const QByteArray &data)
+{
+    m_data.clear();
+
+    if (data.startsWith(":") && data.endsWith("\r\n"))
+    {
+        const QByteArray data1 = QByteArray::fromHex(data.mid(1, data.size() - 3));
+
+        if (checksum(data1) == 0)
+            m_data = data1.left(data1.size() - 1);
+    }
+
 }
 
 quint8 AsciiStream::checksum(const QByteArray &data)

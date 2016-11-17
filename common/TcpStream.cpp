@@ -31,6 +31,11 @@ QByteArray TcpStream::data() const
     return m_data;
 }
 
+void TcpStream::setData(const QByteArray &data)
+{
+    m_data.clear();
+}
+
 QByteArray TcpStream::header(quint16 transaction, quint16 protocol, quint16 size)
 {
     QByteArray result;

@@ -14,6 +14,7 @@ public:
     void writeEnd();
 
     QByteArray data() const;
+    void setData(const QByteArray &data);
 
 private:
     static QByteArray header(quint16 transaction, quint16 protocol, quint16 size);

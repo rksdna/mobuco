@@ -14,6 +14,9 @@ private slots:
     void outputRtuTest();
     void outputAsciiTest();
     void outputTcpTest();
+    void inputRtuTest();
+    void inputAsciiTest();
+    void inputTcpTest();
 
 };
 

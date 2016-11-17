@@ -34,6 +34,13 @@ QByteArray RtuStream::data() const
     return m_data;
 }
 
+void RtuStream::setData(const QByteArray &data)
+{
+    m_data.clear();
+    if (checksum(data) == 0)
+        m_data = data.left(data.size() - 2);
+}
+
 quint16 RtuStream::checksum(const QByteArray &data)
 {
     quint16 result = 0xFFFF;

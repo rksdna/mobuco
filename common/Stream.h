@@ -7,6 +7,8 @@ class InputStream
 {
 public:
     virtual ~InputStream();
+
+    virtual void setData(const QByteArray &data) = 0;
 };
 
 class OutputStream

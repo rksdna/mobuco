@@ -3,14 +3,13 @@ INCLUDEPATH += \
     $$PWD
 
 HEADERS += \
-    ../common/Stream.h \
-    ../common/RtuStream.h \
-    ../common/AsciiStream.h \
-    ../common/TcpStream.h
+    $$PWD/Stream.h \
+    $$PWD/RtuStream.h \
+    $$PWD/AsciiStream.h \
+    $$PWD/TcpStream.h
 
 SOURCES += \
-    ../common/Stream.cpp \
-    ../common/RtuStream.cpp \
-    ../common/AsciiStream.cpp \
-    ../common/TcpStream.cpp
-
+    $$PWD/Stream.cpp \
+    $$PWD/RtuStream.cpp \
+    $$PWD/AsciiStream.cpp \
+    $$PWD/TcpStream.cpp

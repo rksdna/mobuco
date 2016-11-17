@@ -14,6 +14,7 @@ public:
     void writeEnd();
 
     QByteArray data() const;
+    void setData(const QByteArray &data);
 
 private:
     static quint16 checksum(const QByteArray &data);
