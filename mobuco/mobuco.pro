@@ -4,6 +4,7 @@ TEMPLATE = app
 QT += core gui widgets
 
 include(../translations/translations.pri)
+include(../common/common.pri)
 
 TARGET = $$DEPLOY_TARGET
 target.path = $$DEPLOY_BIN_DIR

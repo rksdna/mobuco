@@ -2,5 +2,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mobuco
+    mobuco \
+    test
 
