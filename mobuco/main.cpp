@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
     QApplication application(argc, argv);
 
     application.setApplicationName(DEPLOY_NAME);
+    application.setApplicationDisplayName(DEPLOY_NAME);
     application.setApplicationVersion(DEPLOY_VERSION);
     application.setOrganizationDomain(DEPLOY_DOMAIN);
     application.setOrganizationName(DEPLOY_ORGANIZATION);

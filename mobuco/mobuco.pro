@@ -11,10 +11,12 @@ target.path = $$DEPLOY_BIN_DIR
 
 SOURCES += \
     main.cpp \
-    MainWindow.cpp
+    MainWindow.cpp \
+    ScheduleWidget.cpp
 
 HEADERS += \
-    MainWindow.h
+    MainWindow.h \
+    ScheduleWidget.h
 
 RESOURCES += \
     mobuco.qrc
