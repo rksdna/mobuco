@@ -9,8 +9,9 @@ class ScheduleWidget : public QWidget
 public:
     explicit ScheduleWidget(QWidget *parent = 0);
     QString fileName() const;
+    bool isNew() const;
     bool isModified() const;
-    void createNew();
+    void createNew(const QString &fileName);
     bool loadFromFile(const QString &fileName);
     bool saveToFile(const QString &fileName);
 
@@ -21,10 +22,11 @@ private slots:
     void touch();
 
 private:
-    void setFileState(const QString &fileName, bool modified);
+    void setFileState(const QString &fileName, bool a, bool m);
 
 private:
     QString _fileName;
+    bool _allocated;
     bool _modified;
 };
 

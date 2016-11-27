@@ -6,6 +6,7 @@
 ScheduleWidget::ScheduleWidget(QWidget *parent)
     : QWidget(parent)
 {
+    _allocated = false;
     _modified = false;
 
     QPushButton * const touchButton = new QPushButton("Touch");
@@ -20,36 +21,42 @@ QString ScheduleWidget::fileName() const
     return _fileName;
 }
 
+bool ScheduleWidget::isNew() const
+{
+    return _allocated;
+}
+
 bool ScheduleWidget::isModified() const
 {
     return _modified;
 }
 
-void ScheduleWidget::createNew()
+void ScheduleWidget::createNew(const QString &fileName)
 {
-    setFileState("new.json", false);
+    setFileState(fileName, true, false);
 }
 
 bool ScheduleWidget::loadFromFile(const QString &fileName)
 {
-    setFileState(fileName, false);
-    return true;
+    setFileState(fileName, false, false);
+    return false;
 }
 
 bool ScheduleWidget::saveToFile(const QString &fileName)
 {
-    setFileState(fileName, false);
+    setFileState(fileName, false, false);
     return true;
 }
 
 void ScheduleWidget::touch()
 {
-    setFileState(fileName(), !isModified());
+    setFileState(fileName(), false, !isModified());
 }
 
-void ScheduleWidget::setFileState(const QString &fileName, bool m)
+void ScheduleWidget::setFileState(const QString &fileName, bool a, bool m)
 {
     _fileName = fileName;
+    _allocated = a;
     _modified = m;
     emit modified(this);
 }
