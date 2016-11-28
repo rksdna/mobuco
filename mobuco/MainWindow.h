@@ -11,9 +11,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 
 protected:
+    void hideEvent(QHideEvent *event);
     void closeEvent(QCloseEvent *event);
 
 private:
@@ -48,11 +48,9 @@ private slots:
     void closeFileByIndex(int index);
     void closeAllFiles();
     void setBatchArgument(const QString &argument);
-    void closeFileDialog();
     void updateTabHeader(ScheduleWidget *widget);
     void updateWindowHeader();
     void showErrorMessage(const QString &text);
-
     void adjBatch(QList<ScheduleWidget *> w);
 
 private:

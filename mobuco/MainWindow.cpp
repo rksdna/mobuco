@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <QApplication>
+#include "FileDialog.h"
 #include "ListDialog.h"
 #include "MainWindow.h"
 #include "ScheduleWidget.h"
@@ -84,11 +85,13 @@ MainWindow::MainWindow(QWidget *parent)
     restoreState(settings.value("MainWindow/State").toByteArray());
 }
 
-MainWindow::~MainWindow()
+void MainWindow::hideEvent(QHideEvent *event)
 {
     QSettings settings;
     settings.setValue("MainWindow/Geometry", saveGeometry());
     settings.setValue("MainWindow/State", saveState());
+
+    QMainWindow::hideEvent(event);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -119,16 +122,8 @@ void MainWindow::createFile()
 
 void MainWindow::openFile()
 {
-    QSettings settings;
-
-    QFileDialog * const dialog  = new QFileDialog(this);
-    dialog->setAcceptMode(QFileDialog::AcceptOpen);
-    dialog->setFileMode(QFileDialog::ExistingFiles);
-    dialog->setNameFilter(tr("JSON files (*.json)\nAny files (*)"));
-    dialog->restoreGeometry(settings.value("MainWindow/FileDialog/Geometry").toByteArray());
-    dialog->restoreState(settings.value("MainWindow/FileDialog/State").toByteArray());
+    FileDialog * const dialog  = new FileDialog(FileDialog::OpenFiles, this);
     connect(dialog, &QFileDialog::filesSelected, this, &MainWindow::openSelectedFiles);
-    connect(dialog, &QFileDialog::finished, this, &MainWindow::closeFileDialog);
 
     dialog->open();
 }
@@ -196,19 +191,6 @@ void MainWindow::setBatchArgument(const QString &argument)
 {
     m_batch.first().argument = argument;
     executeBatch();
-}
-
-void MainWindow::closeFileDialog()
-{
-    QFileDialog * const dialog = qobject_cast<QFileDialog *>(sender());
-    if (dialog)
-    {
-        QSettings settings;
-        settings.setValue("MainWindow/FileDialog/Geometry", dialog->saveGeometry());
-        settings.setValue("MainWindow/FileDialog/State", dialog->saveState());
-
-        dialog->deleteLater();
-    }
 }
 
 void MainWindow::updateTabHeader(ScheduleWidget *widget)
@@ -294,7 +276,6 @@ void MainWindow::executeBatch()
     else
     {
         ListDialog * const dialog = new ListDialog(wc, this);
-        connect(dialog, &ListDialog::finished, dialog, &ListDialog::deleteLater);
         connect(dialog, &ListDialog::selected, this, &MainWindow::adjBatch);
 
         dialog->open();
@@ -329,18 +310,9 @@ void MainWindow::adjustedBatch()
     case Command::Save:
         if (command.argument.isEmpty())
         {
-            QSettings settings;
-
-            QFileDialog * const dialog  = new QFileDialog(this);
-            dialog->setAcceptMode(QFileDialog::AcceptSave);
-            dialog->setFileMode(QFileDialog::AnyFile);
-            dialog->setNameFilter(tr("JSON files (*.json)"));
-            dialog->setDefaultSuffix("json");
+            FileDialog * const dialog  = new FileDialog(FileDialog::SaveFile, this);
             dialog->selectFile(m_batch.first().widget->fileName());
-            dialog->restoreGeometry(settings.value("MainWindow/FileDialog/Geometry").toByteArray());
-            dialog->restoreState(settings.value("MainWindow/FileDialog/State").toByteArray());
             connect(dialog, &QFileDialog::fileSelected, this, &MainWindow::setBatchArgument);
-            connect(dialog, &QFileDialog::finished, this, &MainWindow::closeFileDialog);
 
             dialog->open();
             return;

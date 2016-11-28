@@ -16,6 +16,9 @@ public:
 signals:
     void selected(const QList<ScheduleWidget *> widgets);
 
+protected:
+    void hideEvent(QHideEvent *event);
+
 private slots:
     void save();
     void discard();
