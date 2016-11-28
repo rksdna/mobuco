@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <QApplication>
+#include "ListDialog.h"
 #include "MainWindow.h"
 #include "ScheduleWidget.h"
 
@@ -95,12 +96,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (m_tabWidget->count())
     {
         event->ignore();
+
         m_batch.clear();
-        for (int index = 0; index < m_tabWidget->count(); index++)
-        {
-            m_batch.append(Command(Command::Save, widget(index)));
-            m_batch.append(Command(Command::Close, widget(index)));
-        }
+        foreach (ScheduleWidget *widget, all())
+            m_batch.append(Command(Command::Close, widget));
 
         m_batch.append(Command(Command::Quit, 0, QString()));
         executeBatch();
@@ -162,8 +161,8 @@ void MainWindow::saveFileAs()
 void MainWindow::saveAllFiles()
 {
     m_batch.clear();
-    for (int index = 0; index < m_tabWidget->count(); index++)
-        m_batch.append(Command(Command::Save, widget(index)));
+    foreach (ScheduleWidget *widget, all())
+        m_batch.append(Command(Command::Save, widget));
 
     executeBatch();
 }
@@ -171,7 +170,6 @@ void MainWindow::saveAllFiles()
 void MainWindow::closeFile()
 {
     m_batch.clear();
-    m_batch.append(Command(Command::Save, currentWidget()));
     m_batch.append(Command(Command::Close, currentWidget()));
 
     executeBatch();
@@ -180,7 +178,6 @@ void MainWindow::closeFile()
 void MainWindow::closeFileByIndex(int index)
 {
     m_batch.clear();
-    m_batch.append(Command(Command::Save, widget(index)));
     m_batch.append(Command(Command::Close, widget(index)));
 
     executeBatch();
@@ -189,11 +186,8 @@ void MainWindow::closeFileByIndex(int index)
 void MainWindow::closeAllFiles()
 {
     m_batch.clear();
-    for (int index = 0; index < m_tabWidget->count(); index++)
-    {
-        m_batch.append(Command(Command::Save, widget(index)));
-        m_batch.append(Command(Command::Close, widget(index)));
-    }
+    foreach (ScheduleWidget *widget, all())
+        m_batch.append(Command(Command::Close, widget));
 
     executeBatch();
 }
@@ -262,7 +256,60 @@ ScheduleWidget *MainWindow::widget(int index) const
     return qobject_cast<ScheduleWidget *>(m_tabWidget->widget(index));
 }
 
+QList<ScheduleWidget *> MainWindow::all() const
+{
+    QList<ScheduleWidget *> result;
+    for (int i = 0; i < m_tabWidget->count(); i++)
+        result.append(widget(i));
+
+    return result;
+}
+
+QList<ScheduleWidget *> MainWindow::modified() const
+{
+    QList<ScheduleWidget *> result;
+    for (int i = 0; i < m_tabWidget->count(); i++)
+    {
+        if (widget(i)->isModified())
+            result.append(widget(i));
+    }
+
+    return result;
+}
+
 void MainWindow::executeBatch()
+{
+    QList<ScheduleWidget *> wc;
+
+    foreach (const Command &cmd, m_batch)
+    {
+        if ((cmd.type == Command::Close) && cmd.widget->isModified())
+        {
+            wc.append(cmd.widget);
+        }
+    }
+
+    if (wc.isEmpty())
+        adjustedBatch();
+    else
+    {
+        ListDialog * const dialog = new ListDialog(wc, this);
+        connect(dialog, &ListDialog::finished, dialog, &ListDialog::deleteLater);
+        connect(dialog, &ListDialog::selected, this, &MainWindow::adjBatch);
+
+        dialog->open();
+    }
+}
+
+void MainWindow::adjBatch(QList<ScheduleWidget *> w)
+{
+    foreach (ScheduleWidget *widget, w)
+        m_batch.prepend(Command(Command::Save, widget));
+
+    adjustedBatch();
+}
+
+void MainWindow::adjustedBatch()
 {
     const Command command = m_batch.first();
     switch (command.type)
@@ -298,6 +345,7 @@ void MainWindow::executeBatch()
             dialog->open();
             return;
         }
+
         if (!command.widget->saveToFile(command.argument))
         {
             showErrorMessage(tr("Can't save: %1").arg(command.argument));
@@ -320,7 +368,7 @@ void MainWindow::executeBatch()
 
     m_batch.removeFirst();
     if (!m_batch.isEmpty())
-        executeBatch();
+        adjustedBatch();
 }
 
 

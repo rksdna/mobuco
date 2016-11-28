@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QFileInfo>
 #include <QBoxLayout>
 #include <QPushButton>
@@ -44,13 +45,14 @@ bool ScheduleWidget::loadFromFile(const QString &fileName)
 
 bool ScheduleWidget::saveToFile(const QString &fileName)
 {
+    qDebug() << "Save" << fileName;
     setFileState(fileName, false, false);
     return true;
 }
 
 void ScheduleWidget::touch()
 {
-    setFileState(fileName(), false, !isModified());
+    setFileState(fileName(), isNew(), !isModified());
 }
 
 void ScheduleWidget::setFileState(const QString &fileName, bool a, bool m)

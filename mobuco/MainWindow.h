@@ -53,11 +53,16 @@ private slots:
     void updateWindowHeader();
     void showErrorMessage(const QString &text);
 
+    void adjBatch(QList<ScheduleWidget *> w);
+
 private:
     ScheduleWidget *createWidget();
     ScheduleWidget *currentWidget() const;
     ScheduleWidget *widget(int index) const;
+    QList<ScheduleWidget *> all() const;
+    QList<ScheduleWidget *> modified() const;
     void executeBatch();
+    void adjustedBatch();
 
 private:
     QTabWidget * const m_tabWidget;
