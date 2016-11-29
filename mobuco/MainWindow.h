@@ -1,10 +1,56 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QQueue>
 #include <QMainWindow>
 
 class QTabWidget;
 class ScheduleWidget;
+
+class Controller : public QObject
+{
+    Q_OBJECT
+public:
+    explicit Controller(QWidget *parent = 0);
+    QWidget *widget() const;
+
+private:
+    QWidget * const m_widget;
+};
+
+class SaveController : public Controller
+{
+    Q_OBJECT
+public:
+    explicit SaveController(const QList<ScheduleWidget *> &items, QWidget *parent = 0);
+    ~SaveController();
+
+public slots:
+    void process();
+    void save(const QString &fileName);
+
+signals:
+    void processed();
+    void stopped();
+    void saved(ScheduleWidget *item);
+
+private:
+    QString m_fileName;
+    QList<ScheduleWidget *> m_items;
+};
+
+/*class CloseController : public Controller
+{
+    Q_OBJECT
+public:
+    explicit CloseController(const QList<ScheduleWidget *> items, QWidget *parent = 0);
+    ~CloseController();
+
+public slots:
+    void process();
+    void close(ScheduleWidget *item);
+};*/
+
 
 class MainWindow : public QMainWindow
 {
@@ -16,27 +62,6 @@ protected:
     void hideEvent(QHideEvent *event);
     void closeEvent(QCloseEvent *event);
 
-private:
-    struct Command
-    {
-        enum Type
-        {
-            New,
-            Open,
-            Save,
-            Close,
-            Quit
-        };
-
-        Command(Type type);
-        Command(Type type, ScheduleWidget *widget);
-        Command(Type type, ScheduleWidget *widget, const QString &argument);
-
-        Type type;
-        ScheduleWidget *widget;
-        QString argument;
-    };
-
 private slots:
     void createFile();
     void openFile();
@@ -47,24 +72,23 @@ private slots:
     void closeFile();
     void closeFileByIndex(int index);
     void closeAllFiles();
-    void setBatchArgument(const QString &argument);
-    void updateTabHeader(ScheduleWidget *widget);
+
+    void updateTabHeader(ScheduleWidget *item);
     void updateWindowHeader();
+
+    void showOpenDialog();
+    void showSaveDialog(const QString &fileName);
+    void showPickDialog(const QList<ScheduleWidget *> items);
     void showErrorMessage(const QString &text);
-    void adjBatch(QList<ScheduleWidget *> w);
 
 private:
-    ScheduleWidget *createWidget();
-    ScheduleWidget *currentWidget() const;
-    ScheduleWidget *widget(int index) const;
-    QList<ScheduleWidget *> all() const;
-    QList<ScheduleWidget *> modified() const;
-    void executeBatch();
-    void adjustedBatch();
+    ScheduleWidget *createItem();
+    ScheduleWidget *currentItem() const;
+    ScheduleWidget *item(int index) const;
+    QList<ScheduleWidget *> items() const;
 
 private:
     QTabWidget * const m_tabWidget;
-    QList<Command> m_batch;
 };
 
 #endif // MAINWINDOW_H

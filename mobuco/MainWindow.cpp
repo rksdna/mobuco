@@ -14,25 +14,75 @@
 #include "OpenScheduleDialog.h"
 #include "PickScheduleDialog.h"
 
-MainWindow::Command::Command(MainWindow::Command::Type type)
-    : type(type),
-      widget(0)
+Controller::Controller(QWidget *parent)
+    : QObject(parent),
+      m_widget(parent)
 {
 }
 
-MainWindow::Command::Command(MainWindow::Command::Type type, ScheduleWidget *widget)
-    : type(type),
-      widget(widget),
-      argument(widget->isNew() ? QString() : widget->fileName())
+QWidget *Controller::widget() const
+{
+    return m_widget;
+}
+
+
+SaveController::SaveController(const QList<ScheduleWidget *> &items, QWidget *parent)
+    : Controller(parent),
+      m_items(items)
 {
 }
 
-MainWindow::Command::Command(MainWindow::Command::Type type, ScheduleWidget *widget, const QString &argument)
-    : type(type),
-      widget(widget),
-      argument(argument)
+SaveController::~SaveController()
 {
+    qDebug() << "Save bue";
 }
+
+void SaveController::process()
+{
+    while (!m_items.isEmpty())
+    {
+        ScheduleWidget * const item = m_items.first();
+
+        if (item->isNew() && m_fileName.isEmpty())
+        {
+            SaveScheduleDialog * const dialog = new SaveScheduleDialog(item->fileName(), widget());
+            connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
+            connect(dialog, &OpenScheduleDialog::rejected, this, &SaveController::stopped);
+
+            connect(dialog, &OpenScheduleDialog::fileSelected, this, &SaveController::save);
+
+            dialog->open();
+            return;
+        }
+        else
+        {
+            if (!item->isNew())
+                m_fileName = item->fileName();
+
+            if (!item->saveToFile(m_fileName))
+            {
+                qDebug() << "SHIT";
+                emit stopped();
+                return;
+            }
+
+            emit saved(item);
+            m_items.removeFirst();
+            m_fileName.clear();
+        }
+    }
+
+    qDebug() << "Save done";
+    emit processed();
+}
+
+void SaveController::save(const QString &fileName)
+{
+    m_fileName = fileName;
+    process();
+}
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -98,104 +148,57 @@ void MainWindow::hideEvent(QHideEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    qDebug() << "x" << m_tabWidget->count();
-
-    if (m_tabWidget->count())
-    {
-        event->ignore();
-
-        m_batch.clear();
-        foreach (ScheduleWidget *widget, all())
-            m_batch.append(Command(Command::Close, widget));
-
-        m_batch.append(Command(Command::Quit, 0, QString()));
-        executeBatch();
-        return;
-    }
-
     QMainWindow::closeEvent(event);
 }
 
 void MainWindow::createFile()
 {
-    m_batch.clear();
-    m_batch.append(Command(Command::New, createWidget(), tr("new.json")));
-
-    executeBatch();
+    static int n = 1;
+    createItem()->createNew(tr("%1.json").arg(n++));
 }
 
 void MainWindow::openFile()
 {
-    OpenScheduleDialog * const dialog  = new OpenScheduleDialog(this);
-    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
-    connect(dialog, &OpenScheduleDialog::filesSelected, this, &MainWindow::openSelectedFiles);
 
-    dialog->open();
 }
 
 void MainWindow::openSelectedFiles(const QStringList &fileNames)
 {
-    m_batch.clear();
-    foreach (const QString &fileName, fileNames)
-        m_batch.append(Command(Command::Open, createWidget(), fileName));
 
-    executeBatch();
 }
 
 void MainWindow::saveFile()
 {
-    m_batch.clear();
-    m_batch.append(Command(Command::Save, currentWidget()));
 
-    executeBatch();
 }
 
 void MainWindow::saveFileAs()
 {
-    m_batch.clear();
-    m_batch.append(Command(Command::Save, currentWidget(), QString()));
 
-    executeBatch();
 }
 
 void MainWindow::saveAllFiles()
 {
-    m_batch.clear();
-    foreach (ScheduleWidget *widget, all())
-        m_batch.append(Command(Command::Save, widget));
+    SaveController * const c = new SaveController(items(), this);
+    connect(c, &SaveController::processed, c, &SaveController::deleteLater);
+    connect(c, &SaveController::stopped, c, &SaveController::deleteLater);
 
-    executeBatch();
+    c->process();
 }
 
 void MainWindow::closeFile()
 {
-    m_batch.clear();
-    m_batch.append(Command(Command::Close, currentWidget()));
 
-    executeBatch();
 }
 
 void MainWindow::closeFileByIndex(int index)
 {
-    m_batch.clear();
-    m_batch.append(Command(Command::Close, widget(index)));
 
-    executeBatch();
 }
 
 void MainWindow::closeAllFiles()
 {
-    m_batch.clear();
-    foreach (ScheduleWidget *widget, all())
-        m_batch.append(Command(Command::Close, widget));
 
-    executeBatch();
-}
-
-void MainWindow::setBatchArgument(const QString &argument)
-{
-    m_batch.first().argument = argument;
-    executeBatch();
 }
 
 void MainWindow::updateTabHeader(ScheduleWidget *widget)
@@ -203,15 +206,42 @@ void MainWindow::updateTabHeader(ScheduleWidget *widget)
     const QString title = (widget->isModified() ? tr("%1*") : tr("%1")).arg(widget->fileName());
     m_tabWidget->setTabText(m_tabWidget->indexOf(widget), title);
 
-    if (widget == currentWidget())
+    if (widget == currentItem())
         updateWindowHeader();
 }
 
 void MainWindow::updateWindowHeader()
 {
-    ScheduleWidget * const widget = currentWidget();
+    ScheduleWidget * const widget = currentItem();
     setWindowFilePath(widget ? widget->fileName() : QString());
     setWindowModified(widget ? widget->isModified() : false);
+}
+
+void MainWindow::showOpenDialog()
+{
+    /*OpenScheduleDialog * const dialog  = new OpenScheduleDialog(this);
+    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
+    connect(dialog, &OpenScheduleDialog::filesSelected, this, &MainWindow::openSelectedFiles);
+
+    dialog->open();*/
+}
+
+void MainWindow::showSaveDialog(const QString &fileName)
+{
+    /*SaveScheduleDialog * const dialog  = new SaveScheduleDialog(fileName, this);
+    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
+    connect(dialog, &OpenScheduleDialog::fileSelected, this, &MainWindow::saveSelectedFile);
+
+    dialog->open();*/
+}
+
+void MainWindow::showPickDialog(const QList<ScheduleWidget *> items)
+{
+    /*PickScheduleDialog * const dialog = new PickScheduleDialog(tr("Save this files?"), items, this);
+    connect(dialog, &PickScheduleDialog::finished, dialog, &PickScheduleDialog::deleteLater);
+    connect(dialog, &PickScheduleDialog::selected, this, &MainWindow::_doSave);
+
+    dialog->open();*/
 }
 
 void MainWindow::showErrorMessage(const QString &text)
@@ -224,7 +254,7 @@ void MainWindow::showErrorMessage(const QString &text)
     box->open();
 }
 
-ScheduleWidget *MainWindow::createWidget()
+ScheduleWidget *MainWindow::createItem()
 {
     ScheduleWidget * const widget = new ScheduleWidget;
     m_tabWidget->addTab(widget, QString());
@@ -233,122 +263,23 @@ ScheduleWidget *MainWindow::createWidget()
     return widget;
 }
 
-ScheduleWidget *MainWindow::currentWidget() const
+ScheduleWidget *MainWindow::currentItem() const
 {
     return qobject_cast<ScheduleWidget *>(m_tabWidget->currentWidget());
 }
 
-ScheduleWidget *MainWindow::widget(int index) const
+ScheduleWidget *MainWindow::item(int index) const
 {
     return qobject_cast<ScheduleWidget *>(m_tabWidget->widget(index));
 }
 
-QList<ScheduleWidget *> MainWindow::all() const
+QList<ScheduleWidget *> MainWindow::items() const
 {
     QList<ScheduleWidget *> result;
     for (int i = 0; i < m_tabWidget->count(); i++)
-        result.append(widget(i));
+        result.append(item(i));
 
     return result;
-}
-
-QList<ScheduleWidget *> MainWindow::modified() const
-{
-    QList<ScheduleWidget *> result;
-    for (int i = 0; i < m_tabWidget->count(); i++)
-    {
-        if (widget(i)->isModified())
-            result.append(widget(i));
-    }
-
-    return result;
-}
-
-void MainWindow::executeBatch()
-{
-    QList<ScheduleWidget *> wc;
-
-    foreach (const Command &cmd, m_batch)
-    {
-        if ((cmd.type == Command::Close) && cmd.widget->isModified())
-        {
-            wc.append(cmd.widget);
-        }
-    }
-
-    if (wc.isEmpty())
-        adjBatch(wc);
-    else
-    {
-        PickScheduleDialog * const dialog = new PickScheduleDialog(tr("Save?"), wc, this);
-        connect(dialog, &PickScheduleDialog::finished, dialog, &PickScheduleDialog::deleteLater);
-        connect(dialog, &PickScheduleDialog::selected, this, &MainWindow::adjBatch);
-
-        dialog->open();
-    }
-}
-
-void MainWindow::adjBatch(QList<ScheduleWidget *> w)
-{
-    foreach (ScheduleWidget *widget, w)
-        m_batch.prepend(Command(Command::Save, widget));
-
-    adjustedBatch();
-}
-
-void MainWindow::adjustedBatch()
-{
-    const Command command = m_batch.first();
-    switch (command.type)
-    {
-    case Command::New:
-        command.widget->createNew(command.argument);
-        break;
-
-    case Command::Open:
-        if (!command.widget->loadFromFile(command.argument))
-        {
-            showErrorMessage(tr("Can't open: %1").arg(command.argument));
-            return;
-        }
-        break;
-
-    case Command::Save:
-        if (command.argument.isEmpty())
-        {
-            SaveScheduleDialog * const dialog  = new SaveScheduleDialog(m_batch.first().widget->fileName(), this);
-            connect(dialog, &SaveScheduleDialog::finished, dialog, &SaveScheduleDialog::deleteLater);
-            connect(dialog, &SaveScheduleDialog::fileSelected, this, &MainWindow::setBatchArgument);
-
-            dialog->open();
-            return;
-        }
-
-        if (!command.widget->saveToFile(command.argument))
-        {
-            showErrorMessage(tr("Can't save: %1").arg(command.argument));
-            return;
-        }
-        break;
-
-    case Command::Close:
-        qDebug() << "xxx";
-        m_tabWidget->removeTab(m_tabWidget->indexOf(command.widget));
-        command.widget->deleteLater();
-        break;
-
-    case Command::Quit:
-        qDebug() << "qu";
-        QTimer::singleShot(0, this, SLOT(close()));
-        break;
-
-    default:
-        break;
-    }
-
-    m_batch.removeFirst();
-    if (!m_batch.isEmpty())
-        adjustedBatch();
 }
 
 

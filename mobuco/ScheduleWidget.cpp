@@ -34,18 +34,20 @@ bool ScheduleWidget::isModified() const
 
 void ScheduleWidget::createNew(const QString &fileName)
 {
+    qDebug() << Q_FUNC_INFO << fileName;
     setFileState(fileName, true, false);
 }
 
 bool ScheduleWidget::loadFromFile(const QString &fileName)
 {
+    qDebug() << Q_FUNC_INFO << fileName;
     setFileState(fileName, false, false);
     return false;
 }
 
 bool ScheduleWidget::saveToFile(const QString &fileName)
 {
-    qDebug() << "Save" << fileName;
+    qDebug() << Q_FUNC_INFO << fileName;
     setFileState(fileName, false, false);
     return true;
 }
