@@ -1,4 +1,5 @@
 #include <QMenu>
+#include <QTimer>
 #include <QDebug>
 #include <QMenuBar>
 #include <QSettings>
@@ -7,10 +8,11 @@
 #include <QFileDialog>
 #include <QCloseEvent>
 #include <QApplication>
-#include "FileDialog.h"
-#include "ListDialog.h"
 #include "MainWindow.h"
 #include "ScheduleWidget.h"
+#include "SaveScheduleDialog.h"
+#include "OpenScheduleDialog.h"
+#include "PickScheduleDialog.h"
 
 MainWindow::Command::Command(MainWindow::Command::Type type)
     : type(type),
@@ -96,6 +98,8 @@ void MainWindow::hideEvent(QHideEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    qDebug() << "x" << m_tabWidget->count();
+
     if (m_tabWidget->count())
     {
         event->ignore();
@@ -122,8 +126,9 @@ void MainWindow::createFile()
 
 void MainWindow::openFile()
 {
-    FileDialog * const dialog  = new FileDialog(FileDialog::OpenFiles, this);
-    connect(dialog, &QFileDialog::filesSelected, this, &MainWindow::openSelectedFiles);
+    OpenScheduleDialog * const dialog  = new OpenScheduleDialog(this);
+    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
+    connect(dialog, &OpenScheduleDialog::filesSelected, this, &MainWindow::openSelectedFiles);
 
     dialog->open();
 }
@@ -272,11 +277,12 @@ void MainWindow::executeBatch()
     }
 
     if (wc.isEmpty())
-        adjustedBatch();
+        adjBatch(wc);
     else
     {
-        ListDialog * const dialog = new ListDialog(wc, this);
-        connect(dialog, &ListDialog::selected, this, &MainWindow::adjBatch);
+        PickScheduleDialog * const dialog = new PickScheduleDialog(tr("Save?"), wc, this);
+        connect(dialog, &PickScheduleDialog::finished, dialog, &PickScheduleDialog::deleteLater);
+        connect(dialog, &PickScheduleDialog::selected, this, &MainWindow::adjBatch);
 
         dialog->open();
     }
@@ -310,9 +316,9 @@ void MainWindow::adjustedBatch()
     case Command::Save:
         if (command.argument.isEmpty())
         {
-            FileDialog * const dialog  = new FileDialog(FileDialog::SaveFile, this);
-            dialog->selectFile(m_batch.first().widget->fileName());
-            connect(dialog, &QFileDialog::fileSelected, this, &MainWindow::setBatchArgument);
+            SaveScheduleDialog * const dialog  = new SaveScheduleDialog(m_batch.first().widget->fileName(), this);
+            connect(dialog, &SaveScheduleDialog::finished, dialog, &SaveScheduleDialog::deleteLater);
+            connect(dialog, &SaveScheduleDialog::fileSelected, this, &MainWindow::setBatchArgument);
 
             dialog->open();
             return;
@@ -326,12 +332,14 @@ void MainWindow::adjustedBatch()
         break;
 
     case Command::Close:
+        qDebug() << "xxx";
         m_tabWidget->removeTab(m_tabWidget->indexOf(command.widget));
         command.widget->deleteLater();
         break;
 
     case Command::Quit:
-        close();
+        qDebug() << "qu";
+        QTimer::singleShot(0, this, SLOT(close()));
         break;
 
     default:

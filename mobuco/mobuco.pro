@@ -13,16 +13,18 @@ SOURCES += \
     main.cpp \
     MainWindow.cpp \
     ScheduleWidget.cpp \
-    ListDialog.cpp \
-    ListModel.cpp \
-    FileDialog.cpp
+    OpenScheduleDialog.cpp \
+    SaveScheduleDialog.cpp \
+    PickScheduleDialog.cpp \
+    PickScheduleModel.cpp
 
 HEADERS += \
     MainWindow.h \
     ScheduleWidget.h \
-    ListDialog.h \
-    ListModel.h \
-    FileDialog.h
+    OpenScheduleDialog.h \
+    SaveScheduleDialog.h \
+    PickScheduleDialog.h \
+    PickScheduleModel.h
 
 RESOURCES += \
     mobuco.qrc
