@@ -1,16 +1,15 @@
 #include <QDebug>
-#include <QFileInfo>
 #include <QBoxLayout>
 #include <QPushButton>
 #include "ScheduleWidget.h"
 
-ScheduleWidget::ScheduleWidget(QWidget *parent)
-    : QWidget(parent)
+ScheduleWidget::ScheduleWidget(const QString &fileName, QWidget *parent)
+    : QWidget(parent),
+      m_fileName(fileName),
+      m_isNew(true),
+      m_isModified(false)
 {
-    _allocated = false;
-    _modified = false;
-
-    QPushButton * const touchButton = new QPushButton("Touch");
+    QPushButton * const touchButton = new QPushButton(tr("Touch"));
     connect(touchButton, &QPushButton::clicked, this, &ScheduleWidget::touch);
 
     QBoxLayout * const layout = new QVBoxLayout(this);
@@ -19,48 +18,42 @@ ScheduleWidget::ScheduleWidget(QWidget *parent)
 
 QString ScheduleWidget::fileName() const
 {
-    return _fileName;
+    return m_fileName;
 }
 
 bool ScheduleWidget::isNew() const
 {
-    return _allocated;
+    return m_isNew;
 }
 
 bool ScheduleWidget::isModified() const
 {
-    return _modified;
-}
-
-void ScheduleWidget::createNew(const QString &fileName)
-{
-    qDebug() << Q_FUNC_INFO << fileName;
-    setFileState(fileName, true, false);
+    return m_isModified;
 }
 
 bool ScheduleWidget::loadFromFile(const QString &fileName)
 {
     qDebug() << Q_FUNC_INFO << fileName;
-    setFileState(fileName, false, false);
-    return false;
+    setStatus(fileName, false, false);
+    return qrand() % 2;
 }
 
 bool ScheduleWidget::saveToFile(const QString &fileName)
 {
     qDebug() << Q_FUNC_INFO << fileName;
-    setFileState(fileName, false, false);
-    return true;
+    setStatus(fileName, false, false);
+    return qrand() % 2;
 }
 
 void ScheduleWidget::touch()
 {
-    setFileState(fileName(), isNew(), !isModified());
+    setStatus(fileName(), isNew(), true);
 }
 
-void ScheduleWidget::setFileState(const QString &fileName, bool a, bool m)
+void ScheduleWidget::setStatus(const QString &fileName, bool isNew, bool isModified)
 {
-    _fileName = fileName;
-    _allocated = a;
-    _modified = m;
-    emit modified(this);
+    m_fileName = fileName;
+    m_isNew = isNew;
+    m_isModified = isModified;
+    emit statusChanged(this);
 }

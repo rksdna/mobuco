@@ -7,27 +7,26 @@ class ScheduleWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ScheduleWidget(QWidget *parent = 0);
+    explicit ScheduleWidget(const QString &fileName, QWidget *parent = 0);
     QString fileName() const;
     bool isNew() const;
     bool isModified() const;
-    void createNew(const QString &fileName);
     bool loadFromFile(const QString &fileName);
     bool saveToFile(const QString &fileName);
 
 signals:
-    void modified(ScheduleWidget *widget);
+    void statusChanged(ScheduleWidget *item);
 
 private slots:
     void touch();
 
 private:
-    void setFileState(const QString &fileName, bool a, bool m);
+    void setStatus(const QString &fileName, bool isNew, bool isModified);
 
 private:
-    QString _fileName;
-    bool _allocated;
-    bool _modified;
+    QString m_fileName;
+    bool m_isNew;
+    bool m_isModified;
 };
 
 #endif // SCHEDULEWIDGET_H

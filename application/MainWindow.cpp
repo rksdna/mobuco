@@ -1,98 +1,23 @@
 #include <QMenu>
-#include <QTimer>
 #include <QDebug>
 #include <QMenuBar>
 #include <QSettings>
 #include <QTabWidget>
-#include <QMessageBox>
-#include <QFileDialog>
 #include <QCloseEvent>
 #include <QApplication>
 #include "MainWindow.h"
 #include "ScheduleWidget.h"
-#include "SaveScheduleDialog.h"
-#include "OpenScheduleDialog.h"
-#include "PickScheduleDialog.h"
-
-Controller::Controller(QWidget *parent)
-    : QObject(parent),
-      m_widget(parent)
-{
-}
-
-QWidget *Controller::widget() const
-{
-    return m_widget;
-}
-
-
-SaveController::SaveController(const QList<ScheduleWidget *> &items, QWidget *parent)
-    : Controller(parent),
-      m_items(items)
-{
-}
-
-SaveController::~SaveController()
-{
-    qDebug() << "Save bue";
-}
-
-void SaveController::process()
-{
-    while (!m_items.isEmpty())
-    {
-        ScheduleWidget * const item = m_items.first();
-
-        if (item->isNew() && m_fileName.isEmpty())
-        {
-            SaveScheduleDialog * const dialog = new SaveScheduleDialog(item->fileName(), widget());
-            connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
-            connect(dialog, &OpenScheduleDialog::rejected, this, &SaveController::stopped);
-
-            connect(dialog, &OpenScheduleDialog::fileSelected, this, &SaveController::save);
-
-            dialog->open();
-            return;
-        }
-        else
-        {
-            if (!item->isNew())
-                m_fileName = item->fileName();
-
-            if (!item->saveToFile(m_fileName))
-            {
-                qDebug() << "SHIT";
-                emit stopped();
-                return;
-            }
-
-            emit saved(item);
-            m_items.removeFirst();
-            m_fileName.clear();
-        }
-    }
-
-    qDebug() << "Save done";
-    emit processed();
-}
-
-void SaveController::save(const QString &fileName)
-{
-    m_fileName = fileName;
-    process();
-}
-
-
+#include "MainWindowCommand.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      m_tabWidget(new QTabWidget)
+      m_widget(new QTabWidget)
 {
-    setCentralWidget(m_tabWidget);
+    setCentralWidget(m_widget);
 
-    m_tabWidget->setTabsClosable(true);
-    connect(m_tabWidget, &QTabWidget::currentChanged, this, &MainWindow::updateWindowHeader);
-    connect(m_tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::closeFileByIndex);
+    m_widget->setTabsClosable(true);
+    connect(m_widget, &QTabWidget::currentChanged, this, &MainWindow::updateWindowHeader);
+    connect(m_widget, &QTabWidget::tabCloseRequested, this, &MainWindow::closeFileByIndex);
 
     QMenu * const fileMenu = menuBar()->addMenu(tr("File"));
 
@@ -137,6 +62,19 @@ MainWindow::MainWindow(QWidget *parent)
     restoreState(settings.value("MainWindow/State").toByteArray());
 }
 
+void MainWindow::appendItem(ScheduleWidget *item)
+{
+    m_widget->addTab(item, QString());
+    connect(item, &ScheduleWidget::statusChanged, this, &MainWindow::updateTabHeader);
+    updateTabHeader(item);
+}
+
+void MainWindow::removeItem(ScheduleWidget *item)
+{
+    m_widget->removeTab(m_widget->indexOf(item));
+    item->deleteLater();
+}
+
 void MainWindow::hideEvent(QHideEvent *event)
 {
     QSettings settings;
@@ -148,138 +86,103 @@ void MainWindow::hideEvent(QHideEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    if (!items().isEmpty())
+    {
+        CloseCommand * const command = new CloseCommand(items(), this);
+        connect(command, &CloseCommand::completed, this, &MainWindow::close, Qt::QueuedConnection);
+
+        command->execute();
+        event->ignore();
+        return;
+    }
+
     QMainWindow::closeEvent(event);
 }
 
 void MainWindow::createFile()
 {
-    static int n = 1;
-    createItem()->createNew(tr("%1.json").arg(n++));
+    NewCommand * const command = new NewCommand(this);
+    command->execute();
 }
 
 void MainWindow::openFile()
 {
-
-}
-
-void MainWindow::openSelectedFiles(const QStringList &fileNames)
-{
-
+    OpenCommand * const command = new OpenCommand(this);
+    command->execute();
 }
 
 void MainWindow::saveFile()
 {
-
+    SaveCommand * const command = new SaveCommand(items(m_widget->currentIndex()), this);
+    command->execute();
 }
 
 void MainWindow::saveFileAs()
 {
-
+    SaveCommand * const command = new SaveCommand(items(m_widget->currentIndex()), this);
+    command->setAskFileName(true);
+    command->execute();
 }
 
 void MainWindow::saveAllFiles()
 {
-    SaveController * const c = new SaveController(items(), this);
-    connect(c, &SaveController::processed, c, &SaveController::deleteLater);
-    connect(c, &SaveController::stopped, c, &SaveController::deleteLater);
-
-    c->process();
+    SaveCommand * const command = new SaveCommand(items(), this);
+    command->execute();
 }
 
 void MainWindow::closeFile()
 {
-
+    CloseCommand * const command = new CloseCommand(items(m_widget->currentIndex()), this);
+    command->execute();
 }
 
 void MainWindow::closeFileByIndex(int index)
 {
-
+    CloseCommand * const command = new CloseCommand(items(index), this);
+    command->execute();
 }
 
 void MainWindow::closeAllFiles()
 {
-
+    CloseCommand * const command = new CloseCommand(items(), this);
+    command->execute();
 }
 
-void MainWindow::updateTabHeader(ScheduleWidget *widget)
+void MainWindow::updateTabHeader(ScheduleWidget *item)
 {
-    const QString title = (widget->isModified() ? tr("%1*") : tr("%1")).arg(widget->fileName());
-    m_tabWidget->setTabText(m_tabWidget->indexOf(widget), title);
+    const QString title = (item->isModified() ? tr("%1*") : tr("%1")).arg(item->fileName());
+    m_widget->setTabText(m_widget->indexOf(item), title);
 
-    if (widget == currentItem())
-        updateWindowHeader();
+    updateWindowHeader();
 }
 
 void MainWindow::updateWindowHeader()
 {
-    ScheduleWidget * const widget = currentItem();
-    setWindowFilePath(widget ? widget->fileName() : QString());
-    setWindowModified(widget ? widget->isModified() : false);
-}
-
-void MainWindow::showOpenDialog()
-{
-    /*OpenScheduleDialog * const dialog  = new OpenScheduleDialog(this);
-    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
-    connect(dialog, &OpenScheduleDialog::filesSelected, this, &MainWindow::openSelectedFiles);
-
-    dialog->open();*/
-}
-
-void MainWindow::showSaveDialog(const QString &fileName)
-{
-    /*SaveScheduleDialog * const dialog  = new SaveScheduleDialog(fileName, this);
-    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
-    connect(dialog, &OpenScheduleDialog::fileSelected, this, &MainWindow::saveSelectedFile);
-
-    dialog->open();*/
-}
-
-void MainWindow::showPickDialog(const QList<ScheduleWidget *> items)
-{
-    /*PickScheduleDialog * const dialog = new PickScheduleDialog(tr("Save this files?"), items, this);
-    connect(dialog, &PickScheduleDialog::finished, dialog, &PickScheduleDialog::deleteLater);
-    connect(dialog, &PickScheduleDialog::selected, this, &MainWindow::_doSave);
-
-    dialog->open();*/
-}
-
-void MainWindow::showErrorMessage(const QString &text)
-{
-    QMessageBox * const box = new QMessageBox(this);
-    box->setIcon(QMessageBox::Critical);
-    box->setText(text);
-    connect(box, &QMessageBox::finished, box, &QMessageBox::deleteLater);
-
-    box->open();
-}
-
-ScheduleWidget *MainWindow::createItem()
-{
-    ScheduleWidget * const widget = new ScheduleWidget;
-    m_tabWidget->addTab(widget, QString());
-    connect(widget, &ScheduleWidget::modified, this, &MainWindow::updateTabHeader);
-
-    return widget;
-}
-
-ScheduleWidget *MainWindow::currentItem() const
-{
-    return qobject_cast<ScheduleWidget *>(m_tabWidget->currentWidget());
-}
-
-ScheduleWidget *MainWindow::item(int index) const
-{
-    return qobject_cast<ScheduleWidget *>(m_tabWidget->widget(index));
+    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
+    setWindowFilePath(item ? item->fileName() : QString());
+    setWindowModified(item ? item->isModified() : false);
 }
 
 QList<ScheduleWidget *> MainWindow::items() const
 {
-    QList<ScheduleWidget *> result;
-    for (int i = 0; i < m_tabWidget->count(); i++)
-        result.append(item(i));
+    QList<ScheduleWidget *> items;
+    for (int index = 0; index < m_widget->count(); index++)
+        items.append(itemByIndex(index));
 
-    return result;
+    return items;
 }
 
+QList<ScheduleWidget *> MainWindow::items(int index) const
+{
+    QList<ScheduleWidget *> items;
+    if (itemByIndex(index))
+        items.append(itemByIndex(index));
+
+    return items;
+}
+
+ScheduleWidget *MainWindow::itemByIndex(int index) const
+{
+    return qobject_cast<ScheduleWidget *>(m_widget->widget(index));
+}
 

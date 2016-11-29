@@ -35,13 +35,13 @@ PickScheduleDialog::PickScheduleDialog(const QString &text, const QList<Schedule
 
 void PickScheduleDialog::yes()
 {
-    emit selected(m_model->selectedItems());
+    emit itemsSelected(m_model->selectedItems());
     accept();
 }
 
 void PickScheduleDialog::no()
 {
-    emit selected(QList<ScheduleWidget *>());
+    emit itemsSelected(QList<ScheduleWidget *>());
     accept();
 }
 

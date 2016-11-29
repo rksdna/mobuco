@@ -13,7 +13,7 @@ public:
     explicit PickScheduleDialog(const QString &text, const QList<ScheduleWidget *> &items, QWidget *parent = 0);
 
 signals:
-    void selected(const QList<ScheduleWidget *> &items);
+    void itemsSelected(const QList<ScheduleWidget *> &items);
 
 protected:
     void hideEvent(QHideEvent *event);

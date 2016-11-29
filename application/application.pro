@@ -16,7 +16,8 @@ SOURCES += \
     OpenScheduleDialog.cpp \
     SaveScheduleDialog.cpp \
     PickScheduleDialog.cpp \
-    PickScheduleModel.cpp
+    PickScheduleModel.cpp \
+    MainWindowCommand.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -24,7 +25,8 @@ HEADERS += \
     OpenScheduleDialog.h \
     SaveScheduleDialog.h \
     PickScheduleDialog.h \
-    PickScheduleModel.h
+    PickScheduleModel.h \
+    MainWindowCommand.h
 
 RESOURCES += \
     application.qrc
