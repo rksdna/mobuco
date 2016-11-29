@@ -2,6 +2,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mobuco \
+    application \
     test
 

@@ -27,7 +27,7 @@ HEADERS += \
     PickScheduleModel.h
 
 RESOURCES += \
-    mobuco.qrc
+    application.qrc
 
 INSTALLS += \
     target
