@@ -4,6 +4,8 @@
 #include <QStringList>
 #include "Command.h"
 
+class ScheduleWidget;
+
 class SaveCommand : public Command
 {
     Q_OBJECT

@@ -4,7 +4,6 @@
 #include <QObject>
 
 class MainWindow;
-class ScheduleWidget;
 
 class Command : public QObject
 {

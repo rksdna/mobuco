@@ -10,7 +10,7 @@ NewCommand::NewCommand(MainWindow *parent)
 void NewCommand::execute()
 {
     static int count = 1;
-    window()->appendItem(new ScheduleWidget(tr("new%1").arg(count++)));
+    window()->appendItem(new ScheduleWidget(tr("new-%1.json").arg(count++)));
 
     emit completed();
 }

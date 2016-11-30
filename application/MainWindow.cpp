@@ -188,4 +188,3 @@ ScheduleWidget *MainWindow::itemByIndex(int index) const
 {
     return qobject_cast<ScheduleWidget *>(m_widget->widget(index));
 }
-

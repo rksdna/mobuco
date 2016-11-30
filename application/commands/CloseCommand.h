@@ -1,8 +1,9 @@
 #ifndef CLOSECOMMAND_H
 #define CLOSECOMMAND_H
 
-#include <QList>
 #include "Command.h"
+
+class ScheduleWidget;
 
 class CloseCommand : public Command
 {
