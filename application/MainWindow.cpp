@@ -18,27 +18,30 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setCentralWidget(m_widget);
 
+    // debug
+    QIcon::setThemeName("Mint-X");
+
     m_widget->setTabsClosable(true);
     connect(m_widget, &QTabWidget::currentChanged, this, &MainWindow::updateWindowHeader);
     connect(m_widget, &QTabWidget::tabCloseRequested, this, &MainWindow::closeFileByIndex);
 
     QMenu * const fileMenu = menuBar()->addMenu(tr("File"));
 
-    QAction * const createFileAction = fileMenu->addAction(tr("New"));
+    QAction * const createFileAction = fileMenu->addAction(QIcon::fromTheme("document-new"), tr("New"));
     createFileAction->setShortcut(QKeySequence::New);
     connect(createFileAction, &QAction::triggered, this, &MainWindow::createFile);
 
-    QAction * const openFileAction = fileMenu->addAction(tr("Open..."));
+    QAction * const openFileAction = fileMenu->addAction(QIcon::fromTheme("document-open"), tr("Open..."));
     openFileAction->setShortcut(QKeySequence::Open);
     connect(openFileAction, &QAction::triggered, this, &MainWindow::openFile);
 
     fileMenu->addSeparator();
 
-    QAction * const saveAction = fileMenu->addAction(tr("Save"));
+    QAction * const saveAction = fileMenu->addAction(QIcon::fromTheme("document-save"), tr("Save"));
     saveAction->setShortcut(QKeySequence::Save);
     connect(saveAction, &QAction::triggered, this, &MainWindow::saveFile);
 
-    QAction * const saveAsAction = fileMenu->addAction(tr("Save as..."));
+    QAction * const saveAsAction = fileMenu->addAction(QIcon::fromTheme("document-save-as"), tr("Save as..."));
     saveAsAction->setShortcut(QKeySequence::SaveAs);
     connect(saveAsAction, &QAction::triggered, this, &MainWindow::saveFileAs);
 
@@ -56,9 +59,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     fileMenu->addSeparator();
 
-    QAction * const exitAction = fileMenu->addAction(tr("Exit"));
+    QAction * const exitAction = fileMenu->addAction(QIcon::fromTheme("application-exit"), tr("Exit"));
     exitAction->setShortcut(QKeySequence::Quit);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
+
+    QMenu * const helpMenu = menuBar()->addMenu(tr("Help"));
+
+    QAction * const aboutAction = helpMenu->addAction(QIcon::fromTheme("help-about"), tr("About..."));
+    connect(aboutAction, &QAction::triggered, this, &MainWindow::close);
 
     QSettings settings;
     restoreGeometry(settings.value("MainWindow/Geometry").toByteArray());
@@ -67,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::appendItem(ScheduleWidget *item)
 {
-    m_widget->addTab(item, QString());
+    m_widget->addTab(item, QIcon::fromTheme("text-x-generic"), QString());
     connect(item, &ScheduleWidget::statusChanged, this, &MainWindow::updateTabHeader);
     updateTabHeader(item);
 }

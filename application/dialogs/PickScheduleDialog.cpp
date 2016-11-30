@@ -11,6 +11,8 @@ PickScheduleDialog::PickScheduleDialog(const QString &text, const QList<Schedule
     : QDialog(parent),
       m_model(new PickScheduleModel(items, this))
 {
+    setWindowModality(Qt::ApplicationModal);
+
     QLabel * const label = new QLabel(text);
 
     QListView * const view = new QListView;
@@ -36,18 +38,18 @@ PickScheduleDialog::PickScheduleDialog(const QString &text, const QList<Schedule
 void PickScheduleDialog::yes()
 {
     emit itemsSelected(m_model->selectedItems());
-    accept();
+    setResult(QDialog::Accepted);
 }
 
 void PickScheduleDialog::no()
 {
     emit itemsSelected(QList<ScheduleWidget *>());
-    accept();
+    setResult(QDialog::Accepted);
 }
 
 void PickScheduleDialog::cancel()
 {
-    reject();
+    setResult(QDialog::Rejected);
 }
 
 void PickScheduleDialog::hideEvent(QHideEvent *event)

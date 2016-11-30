@@ -1,3 +1,4 @@
+#include <QIcon>
 #include "ScheduleWidget.h"
 #include "PickScheduleModel.h"
 
@@ -23,11 +24,11 @@ QVariant PickScheduleModel::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         return key->fileName();
 
+    case Qt::DecorationRole:
+        return QIcon::fromTheme("text-x-generic");
+
     case Qt::CheckStateRole:
         return m_items.value(key) ? Qt::Checked : Qt::Unchecked;
-
-    case Qt::SizeHintRole:
-        return QSize(64, 24);
 
     default:
         break;
