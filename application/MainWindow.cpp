@@ -6,8 +6,11 @@
 #include <QCloseEvent>
 #include <QApplication>
 #include "MainWindow.h"
+#include "NewCommand.h"
+#include "OpenCommand.h"
+#include "SaveCommand.h"
+#include "CloseCommand.h"
 #include "ScheduleWidget.h"
-#include "MainWindowCommand.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -25,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     createFileAction->setShortcut(QKeySequence::New);
     connect(createFileAction, &QAction::triggered, this, &MainWindow::createFile);
 
-    QAction * const openFileAction = fileMenu->addAction(tr("Open"));
+    QAction * const openFileAction = fileMenu->addAction(tr("Open..."));
     openFileAction->setShortcut(QKeySequence::Open);
     connect(openFileAction, &QAction::triggered, this, &MainWindow::openFile);
 
@@ -35,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     saveAction->setShortcut(QKeySequence::Save);
     connect(saveAction, &QAction::triggered, this, &MainWindow::saveFile);
 
-    QAction * const saveAsAction = fileMenu->addAction(tr("Save as.."));
+    QAction * const saveAsAction = fileMenu->addAction(tr("Save as..."));
     saveAsAction->setShortcut(QKeySequence::SaveAs);
     connect(saveAsAction, &QAction::triggered, this, &MainWindow::saveFileAs);
 
