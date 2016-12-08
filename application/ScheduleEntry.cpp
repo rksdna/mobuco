@@ -1,5 +1,7 @@
-#include "Delegate.h"
+#include <QJsonArray>
+#include <QJsonObject>
 #include "ScheduleEntry.h"
+#include "EnumerationDelegate.h"
 
 ScheduleEntry::ScheduleEntry(int size)
     : m_data(size)
@@ -22,13 +24,36 @@ bool ScheduleEntry::setValue(int column, const QVariant &value)
     return true;
 }
 
-Delegate *ScheduleEntry::delegate(int column) const
+QVariant ScheduleEntry::delegate(int column) const
 {
-    static ComboDelegate da("A;B;C");
-    static ComboDelegate db("q;w;e");
+    static DelegateSharedPointer da(new EnumerationDelegate("A;B;C"));
+    static DelegateSharedPointer db(new EnumerationDelegate("q;w;e"));
+
+    if (column == 0)
+        return QVariant::fromValue(DelegateSharedPointer(new EnumerationDelegate("r;t;y")));
 
     if (column % 2 == 0)
-        return &da;
+        return QVariant::fromValue(da);
 
-    return &db;
+    return QVariant::fromValue(db);
+}
+
+void ScheduleEntry::readFromJson(const QJsonObject &object)
+{
+    QJsonArray data = object["data"].toArray();
+
+    m_data.resize(data.count());
+    for (int i = 0; i < m_data.count(); i++)
+        m_data[i] = data.at(i).toInt();
+}
+
+QJsonObject ScheduleEntry::writeToJson() const
+{
+    QJsonArray data;
+    for (int i = 0; i < m_data.count(); i++)
+        data.append(m_data.at(i));
+
+    QJsonObject object;
+    object["data"] = data;
+    return object;
 }

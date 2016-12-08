@@ -21,7 +21,7 @@ signals:
     void statusChanged(ScheduleWidget *item);
 
 private slots:
-    void touch();
+    void changeStatus();
 
 private:
     void setStatus(const QString &fileName, bool isNew, bool isModified);

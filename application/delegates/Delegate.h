@@ -1,33 +1,21 @@
 #ifndef DELEGATE_H
 #define DELEGATE_H
 
-#include <QObject>
+#include <QMetaType>
+#include <QSharedPointer>
 
-class Delegate : public QObject
+class Delegate
 {
-    Q_OBJECT
 public:
-    explicit Delegate(QObject *parent = 0);
+    virtual ~Delegate();
     virtual QWidget *createWidget(QWidget *parent) const = 0;
     virtual void destroyEditor(QWidget *editor) const = 0;
-    virtual void setEditorData(QWidget *editor, const QVariant &editorData) const = 0;
+    virtual void setEditorData(QWidget *editor, const QVariant &data) const = 0;
     virtual QVariant editorData(QWidget *editor) const = 0;
-    virtual QVariant displayData(const QVariant &value) const = 0;
 };
 
-class ComboDelegate : public Delegate
-{
-    Q_OBJECT
-public:
-    explicit ComboDelegate(const QString &items, QObject *parent = 0);
-    QWidget *createWidget(QWidget *parent) const;
-    void destroyEditor(QWidget *editor) const;
-    void setEditorData(QWidget *editor, const QVariant &editorData) const;
-    QVariant editorData(QWidget *editor) const;
-    QVariant displayData(const QVariant &value) const;
+typedef QSharedPointer<Delegate> DelegateSharedPointer;
 
-private:
-    const QString m_items;
-};
+Q_DECLARE_METATYPE(DelegateSharedPointer)
 
 #endif // DELEGATE_H

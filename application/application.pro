@@ -30,7 +30,8 @@ SOURCES += \
     ScheduleModel.cpp \
     ScheduleEntry.cpp \
     ScheduleDelegate.cpp \
-    delegates/Delegate.cpp
+    delegates/Delegate.cpp \
+    delegates/EnumerationDelegate.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     ScheduleModel.h \
     ScheduleEntry.h \
     ScheduleDelegate.h \
-    delegates/Delegate.h
+    delegates/Delegate.h \
+    delegates/EnumerationDelegate.h
 
 RESOURCES += \
     application.qrc

@@ -5,6 +5,7 @@
 #include <QVariant>
 
 class Delegate;
+class QJsonObject;
 
 class ScheduleEntry
 {
@@ -13,7 +14,10 @@ public:
     int count() const;
     QVariant value(int column) const;
     bool setValue(int column, const QVariant &value);
-    Delegate *delegate(int column) const;
+    QVariant delegate(int column) const;
+
+    void readFromJson(const QJsonObject &object);
+    QJsonObject writeToJson() const;
 
 private:
     QVector<int> m_data;

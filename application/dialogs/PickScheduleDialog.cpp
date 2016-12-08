@@ -23,7 +23,7 @@ PickScheduleDialog::PickScheduleDialog(const QString &text, const QList<Schedule
 
     QDialogButtonBox * const box = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel);
     connect(box->button(QDialogButtonBox::Yes), &QPushButton::clicked, this, &PickScheduleDialog::yes);
-    connect(box->button(QDialogButtonBox::No), &QPushButton::clicked, this, &PickScheduleDialog::no);
+    connect(box->button(QDialogButtonBox::No), &QPushButton::clicked, this, &PickScheduleDialog::none);
     connect(box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &PickScheduleDialog::cancel);
 
     QBoxLayout * const layout = new QVBoxLayout(this);
@@ -38,18 +38,18 @@ PickScheduleDialog::PickScheduleDialog(const QString &text, const QList<Schedule
 void PickScheduleDialog::yes()
 {
     emit itemsSelected(m_model->selectedItems());
-    setResult(QDialog::Accepted);
+    accept();
 }
 
-void PickScheduleDialog::no()
+void PickScheduleDialog::none()
 {
     emit itemsSelected(QList<ScheduleWidget *>());
-    setResult(QDialog::Accepted);
+    accept();
 }
 
 void PickScheduleDialog::cancel()
 {
-    setResult(QDialog::Rejected);
+    reject();
 }
 
 void PickScheduleDialog::hideEvent(QHideEvent *event)

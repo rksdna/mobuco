@@ -20,7 +20,7 @@ protected:
 
 private slots:
     void yes();
-    void no();
+    void none();
     void cancel();
 
 private:

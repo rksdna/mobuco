@@ -1,3 +1,6 @@
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include "Delegate.h"
 #include "ScheduleModel.h"
 
@@ -24,13 +27,13 @@ QVariant ScheduleModel::data(const QModelIndex &index, int role) const
     const ScheduleEntry &entry = m_entries.at(index.row());
 
     if (role == Qt::DisplayRole)
-        return entry.delegate(index.column())->displayData(entry.value(index.column()));
+        return entry.value(index.column());
 
     if (role == Qt::EditRole)
         return entry.value(index.column());
 
     if (role == Qt::UserRole)
-        return QVariant::fromValue(entry.delegate(index.column()));
+        return entry.delegate(index.column());
 
     return QVariant();
 }
@@ -40,7 +43,13 @@ bool ScheduleModel::setData(const QModelIndex &index, const QVariant &value, int
     ScheduleEntry &entry = m_entries[index.row()];
 
     if (role == Qt::EditRole)
-        return entry.setValue(index.column(), value);
+    {
+        if (entry.setValue(index.column(), value))
+        {
+            emit dataChanged(index, index);
+            return true;
+        }
+    }
 
     return false;
 }
@@ -63,4 +72,43 @@ int ScheduleModel::count() const
         count = qMax(count, entry.count());
 
     return count;
+}
+
+bool ScheduleModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    return false;
+}
+
+bool ScheduleModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    return false;
+}
+
+bool ScheduleModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+{
+    return false;
+}
+
+void ScheduleModel::readFromJson(const QJsonDocument &document)
+{
+    beginResetModel();
+
+    m_entries.clear();
+    foreach (const QJsonValue &value, document.array())
+    {
+        ScheduleEntry entry;
+        entry.readFromJson(value.toObject());
+        m_entries.append(entry);
+    }
+
+    endResetModel();
+}
+
+QJsonDocument ScheduleModel::writeToJson() const
+{
+    QJsonArray array;
+    foreach (const ScheduleEntry &entry, m_entries)
+        array.append(entry.writeToJson());
+
+    return QJsonDocument(array);
 }

@@ -1,7 +1,9 @@
-#include <QDebug>
+#include <QFile>
+#include <QSaveFile>
 #include <QBoxLayout>
 #include <QTableView>
-#include <QPushButton>
+#include <QHeaderView>
+#include <QJsonDocument>
 #include "ScheduleModel.h"
 #include "ScheduleWidget.h"
 #include "ScheduleDelegate.h"
@@ -14,19 +16,21 @@ ScheduleWidget::ScheduleWidget(const QString &fileName, QWidget *parent)
       m_isNew(true),
       m_isModified(false)
 {
-    ScheduleDelegate * const delegate = new ScheduleDelegate(this);
+    connect(m_model, &ScheduleModel::dataChanged, this, &ScheduleWidget::changeStatus);
+    connect(m_model, &ScheduleModel::rowsInserted, this, &ScheduleWidget::changeStatus);
+    connect(m_model, &ScheduleModel::rowsRemoved, this, &ScheduleWidget::changeStatus);
+    connect(m_model, &ScheduleModel::rowsMoved, this, &ScheduleWidget::changeStatus);
 
-    m_view->setItemDelegate(delegate);
+    m_view->setItemDelegate(new ScheduleDelegate(this));
     m_view->setSelectionMode(QTableView::SingleSelection);
     m_view->setSelectionBehavior(QTableView::SelectRows);
+    m_view->horizontalHeader()->setHighlightSections(false);
+    m_view->horizontalHeader()->setStretchLastSection(true);
+    m_view->setAlternatingRowColors(true);
     m_view->setModel(m_model);
-
-    QPushButton * const touchButton = new QPushButton(tr("Touch"));
-    connect(touchButton, &QPushButton::clicked, this, &ScheduleWidget::touch);
 
     QBoxLayout * const layout = new QVBoxLayout(this);
     layout->addWidget(m_view);
-    layout->addWidget(touchButton);
 }
 
 QString ScheduleWidget::fileName() const
@@ -46,21 +50,38 @@ bool ScheduleWidget::isModified() const
 
 bool ScheduleWidget::loadFromFile(const QString &fileName)
 {
-    qDebug() << Q_FUNC_INFO << fileName;
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly))
+        return false;
+
+    QJsonParseError error;
+    const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &error);
+    if (error.error != QJsonParseError::NoError)
+        return false;
+
+    m_model->readFromJson(document);
     setStatus(fileName, false, false);
-    return qrand() % 2;
+    return true;
 }
 
 bool ScheduleWidget::saveToFile(const QString &fileName)
 {
-    qDebug() << Q_FUNC_INFO << fileName;
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly))
+        return false;
+
+    const QJsonDocument document = m_model->writeToJson();
+    file.write(document.toJson());
+    if (!file.commit())
+        return false;
+
     setStatus(fileName, false, false);
-    return qrand() % 2;
+    return true;
 }
 
-void ScheduleWidget::touch()
+void ScheduleWidget::changeStatus()
 {
-    setStatus(fileName(), isNew(), true);
+    setStatus(m_fileName, m_isNew, true);
 }
 
 void ScheduleWidget::setStatus(const QString &fileName, bool isNew, bool isModified)
