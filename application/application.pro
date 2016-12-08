@@ -11,7 +11,8 @@ target.path = $$DEPLOY_BIN_DIR
 
 INCLUDEPATH += \
     commands \
-    dialogs
+    dialogs \
+    delegates
 
 SOURCES += \
     main.cpp \
@@ -25,7 +26,11 @@ SOURCES += \
     commands/NewCommand.cpp \
     commands/OpenCommand.cpp \
     commands/SaveCommand.cpp \
-    commands/CloseCommand.cpp
+    commands/CloseCommand.cpp \
+    ScheduleModel.cpp \
+    ScheduleEntry.cpp \
+    ScheduleDelegate.cpp \
+    delegates/Delegate.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -38,7 +43,11 @@ HEADERS += \
     commands/NewCommand.h \
     commands/OpenCommand.h \
     commands/SaveCommand.h \
-    commands/CloseCommand.h
+    commands/CloseCommand.h \
+    ScheduleModel.h \
+    ScheduleEntry.h \
+    ScheduleDelegate.h \
+    delegates/Delegate.h
 
 RESOURCES += \
     application.qrc

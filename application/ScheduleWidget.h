@@ -3,6 +3,9 @@
 
 #include <QWidget>
 
+class QTableView;
+class ScheduleModel;
+
 class ScheduleWidget : public QWidget
 {
     Q_OBJECT
@@ -24,6 +27,8 @@ private:
     void setStatus(const QString &fileName, bool isNew, bool isModified);
 
 private:
+    ScheduleModel * const m_model;
+    QTableView * const m_view;
     QString m_fileName;
     bool m_isNew;
     bool m_isModified;
