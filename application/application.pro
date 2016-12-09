@@ -22,19 +22,11 @@ SOURCES += \
     dialogs/SaveScheduleDialog.cpp \
     dialogs/PickScheduleDialog.cpp \
     dialogs/PickScheduleModel.cpp \
-    commands/Command.cpp \
-    commands/NewCommand.cpp \
-    commands/OpenCommand.cpp \
-    commands/SaveCommand.cpp \
-    commands/CloseCommand.cpp \
     ScheduleModel.cpp \
     ScheduleEntry.cpp \
     ScheduleDelegate.cpp \
     delegates/Delegate.cpp \
-    delegates/EnumerationDelegate.cpp \
-    commands/RemoveCommand.cpp \
-    commands/InsertCommand.cpp \
-    commands/MoveCommand.cpp
+    delegates/EnumerationDelegate.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -43,19 +35,11 @@ HEADERS += \
     dialogs/SaveScheduleDialog.h \
     dialogs/PickScheduleDialog.h \
     dialogs/PickScheduleModel.h \
-    commands/Command.h \
-    commands/NewCommand.h \
-    commands/OpenCommand.h \
-    commands/SaveCommand.h \
-    commands/CloseCommand.h \
     ScheduleModel.h \
     ScheduleEntry.h \
     ScheduleDelegate.h \
     delegates/Delegate.h \
-    delegates/EnumerationDelegate.h \
-    commands/RemoveCommand.h \
-    commands/InsertCommand.h \
-    commands/MoveCommand.h
+    delegates/EnumerationDelegate.h
 
 RESOURCES += \
     application.qrc

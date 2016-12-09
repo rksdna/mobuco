@@ -96,7 +96,7 @@ void ScheduleWidget::removeEntries()
     }
 }
 
-void ScheduleWidget::moveEntries(ScheduleWidget::Move move)
+void ScheduleWidget::moveEntries(Move move)
 {
     QModelIndexList indexes = m_view->selectionModel()->selectedRows();
     if (!indexes.isEmpty())
