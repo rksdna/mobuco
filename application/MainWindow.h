@@ -28,6 +28,13 @@ private slots:
     void closeFile();
     void closeFileByIndex(int index);
     void closeAllFiles();
+    void insertEntry();
+    void removeEntries();
+    void moveEntriesToTop();
+    void moveEntriesUp();
+    void moveEntriesDown();
+    void moveEntriesToBottom();
+    void about();
     void updateTabHeader(ScheduleWidget *item);
     void updateWindowHeader();
 

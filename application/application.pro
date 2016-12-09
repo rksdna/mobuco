@@ -31,7 +31,10 @@ SOURCES += \
     ScheduleEntry.cpp \
     ScheduleDelegate.cpp \
     delegates/Delegate.cpp \
-    delegates/EnumerationDelegate.cpp
+    delegates/EnumerationDelegate.cpp \
+    commands/RemoveCommand.cpp \
+    commands/InsertCommand.cpp \
+    commands/MoveCommand.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -49,7 +52,10 @@ HEADERS += \
     ScheduleEntry.h \
     ScheduleDelegate.h \
     delegates/Delegate.h \
-    delegates/EnumerationDelegate.h
+    delegates/EnumerationDelegate.h \
+    commands/RemoveCommand.h \
+    commands/InsertCommand.h \
+    commands/MoveCommand.h
 
 RESOURCES += \
     application.qrc

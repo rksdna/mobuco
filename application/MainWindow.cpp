@@ -7,9 +7,12 @@
 #include <QApplication>
 #include "MainWindow.h"
 #include "NewCommand.h"
+#include "MoveCommand.h"
 #include "OpenCommand.h"
 #include "SaveCommand.h"
 #include "CloseCommand.h"
+#include "InsertCommand.h"
+#include "RemoveCommand.h"
 #include "ScheduleWidget.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -50,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     fileMenu->addSeparator();
 
-    QAction * const closeAction = fileMenu->addAction(tr("Close"));
+    QAction * const closeAction = fileMenu->addAction(QIcon::fromTheme("window-close"), tr("Close"));
     closeAction->setShortcut(QKeySequence::Close);
     connect(closeAction, &QAction::triggered, this, &MainWindow::closeFile);
 
@@ -63,10 +66,32 @@ MainWindow::MainWindow(QWidget *parent)
     exitAction->setShortcut(QKeySequence::Quit);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
 
+    QMenu * const editMenu = menuBar()->addMenu(tr("Edit"));
+
+    QAction * const insertAction = editMenu->addAction(QIcon::fromTheme("list-add"), tr("Add"));
+    connect(insertAction, &QAction::triggered, this, &MainWindow::insertEntry);
+
+    QAction * const removeAction = editMenu->addAction(QIcon::fromTheme("list-remove"), tr("Remove"));
+    connect(removeAction, &QAction::triggered, this, &MainWindow::removeEntries);
+
+    editMenu->addSeparator();
+
+    QAction * const moveToTopAction = editMenu->addAction(QIcon::fromTheme("go-top"), tr("Move to top"));
+    connect(moveToTopAction, &QAction::triggered, this, &MainWindow::moveEntriesToTop);
+
+    QAction * const moveUpAction = editMenu->addAction(QIcon::fromTheme("go-up"), tr("Move up"));
+    connect(moveUpAction, &QAction::triggered, this, &MainWindow::moveEntriesUp);
+
+    QAction * const moveDownAction = editMenu->addAction(QIcon::fromTheme("go-down"), tr("Move down"));
+    connect(moveDownAction, &QAction::triggered, this, &MainWindow::moveEntriesDown);
+
+    QAction * const moveToBottomAction = editMenu->addAction(QIcon::fromTheme("go-bottom"), tr("Move to bottom"));
+    connect(moveToBottomAction, &QAction::triggered, this, &MainWindow::moveEntriesToBottom);
+
     QMenu * const helpMenu = menuBar()->addMenu(tr("Help"));
 
     QAction * const aboutAction = helpMenu->addAction(QIcon::fromTheme("help-about"), tr("About..."));
-    connect(aboutAction, &QAction::triggered, this, &MainWindow::close);
+    connect(aboutAction, &QAction::triggered, this, &MainWindow::about);
 
     QSettings settings;
     restoreGeometry(settings.value("MainWindow/Geometry").toByteArray());
@@ -157,6 +182,47 @@ void MainWindow::closeAllFiles()
 {
     CloseCommand * const command = new CloseCommand(items(), this);
     command->execute();
+}
+
+void MainWindow::insertEntry()
+{
+    InsertCommand * const command = new InsertCommand(itemByIndex(m_widget->currentIndex()), this);
+    command->execute();
+}
+
+void MainWindow::removeEntries()
+{
+    RemoveCommand * const command = new RemoveCommand(itemByIndex(m_widget->currentIndex()), this);
+    command->execute();
+}
+
+void MainWindow::moveEntriesToTop()
+{
+    MoveCommand * const command = new MoveCommand(itemByIndex(m_widget->currentIndex()), ScheduleWidget::MoveToTop, this);
+    command->execute();
+}
+
+void MainWindow::moveEntriesUp()
+{
+    MoveCommand * const command = new MoveCommand(itemByIndex(m_widget->currentIndex()), ScheduleWidget::MoveUp, this);
+    command->execute();
+}
+
+void MainWindow::moveEntriesDown()
+{
+    MoveCommand * const command = new MoveCommand(itemByIndex(m_widget->currentIndex()), ScheduleWidget::MoveDown, this);
+    command->execute();
+}
+
+void MainWindow::moveEntriesToBottom()
+{
+    MoveCommand * const command = new MoveCommand(itemByIndex(m_widget->currentIndex()), ScheduleWidget::MoveToBottom, this);
+    command->execute();
+}
+
+void MainWindow::about()
+{
+
 }
 
 void MainWindow::updateTabHeader(ScheduleWidget *item)

@@ -7,19 +7,24 @@
 ScheduleModel::ScheduleModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
+    m_entries.append(ScheduleEntry(0));
+    m_entries.append(ScheduleEntry(1));
     m_entries.append(ScheduleEntry(2));
     m_entries.append(ScheduleEntry(3));
-    m_entries.append(ScheduleEntry(4));
 }
 
 int ScheduleModel::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_entries.count();
+    Q_UNUSED(parent)
+
+    return m_entries.count();
 }
 
 int ScheduleModel::columnCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : count();
+    Q_UNUSED(parent)
+
+    return count();
 }
 
 QVariant ScheduleModel::data(const QModelIndex &index, int role) const
@@ -61,32 +66,55 @@ QVariant ScheduleModel::headerData(int section, Qt::Orientation orientation, int
 
 Qt::ItemFlags ScheduleModel::flags(const QModelIndex &index) const
 {
-    const ScheduleEntry &entry = m_entries.at(index.row());
-    return index.column() < entry.count() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable : Qt::NoItemFlags;
-}
-
-int ScheduleModel::count() const
-{
-    int count = 0;
-    foreach (const ScheduleEntry &entry, m_entries)
-        count = qMax(count, entry.count());
-
-    return count;
+    Q_UNUSED(index)
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
 bool ScheduleModel::insertRows(int row, int count, const QModelIndex &parent)
 {
-    return false;
+    Q_UNUSED(parent)
+
+    beginInsertRows(parent, row, row + count - 1);
+    while (count--)
+        m_entries.insert(row, ScheduleEntry());
+    endInsertRows();
+    return true;
 }
 
 bool ScheduleModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    return false;
+    Q_UNUSED(parent)
+
+    beginRemoveRows(parent, row, row + count - 1);
+    while (count--)
+        m_entries.removeAt(row);
+    endRemoveRows();
+    return true;
 }
 
 bool ScheduleModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
 {
-    return false;
+    Q_UNUSED(sourceParent)
+    Q_UNUSED(destinationParent)
+
+    if (destinationChild < 0 || destinationChild > rowCount() || sourceRow + 1 == destinationChild)
+        return false;
+
+    beginMoveRows(sourceParent, sourceRow, sourceRow + count - 1, destinationParent, destinationChild);
+    if (destinationChild < sourceRow)
+    {
+        while (count--)
+            m_entries.move(sourceRow++, destinationChild++);
+    }
+    else
+    {
+        sourceRow += count;
+        while (count--)
+            m_entries.move(--sourceRow, --destinationChild);
+    }
+    endMoveRows();
+
+    return true;
 }
 
 void ScheduleModel::readFromJson(const QJsonDocument &document)
@@ -111,4 +139,13 @@ QJsonDocument ScheduleModel::writeToJson() const
         array.append(entry.writeToJson());
 
     return QJsonDocument(array);
+}
+
+int ScheduleModel::count() const
+{
+    int count = 0;
+    foreach (const ScheduleEntry &entry, m_entries)
+        count = qMax(count, entry.count());
+
+    return count;
 }
