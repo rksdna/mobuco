@@ -34,14 +34,14 @@ void MainWindow::SaveCloseContext::setSchemesForSave(const QList<SchemeWidget *>
 
 QList<SchemeWidget *> MainWindow::SaveCloseContext::modifiedSchemes() const
 {
-    QList<SchemeWidget *> result;
-    foreach (SchemeWidget *scheme, forClose)
+    QList<SchemeWidget *> schemes;
+    foreach (SchemeWidget *scheme, schemesForClose)
     {
         if (scheme->isModified())
-            result.append(scheme);
+            schemes.append(scheme);
     }
 
-    return result;
+    return schemes;
 }
 
 SchemeWidget *MainWindow::SaveCloseContext::schemeForSave() const
@@ -143,8 +143,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (m_widget->count())
     {
-        event->ignore();
         closeSchemes(schemes(), true);
+        event->ignore();
         return;
     }
 
@@ -159,7 +159,7 @@ void MainWindow::newFile()
 
 void MainWindow::openFile()
 {
-    OpenSchemeDialog * const dialog  = new OpenSchemeDialog(window());
+    OpenSchemeDialog * const dialog  = new OpenSchemeDialog(this);
     connect(dialog, &OpenSchemeDialog::finished, dialog, &OpenSchemeDialog::deleteLater);
     connect(dialog, &OpenSchemeDialog::filesSelected, this, &MainWindow::openSchemes);
 
@@ -329,12 +329,12 @@ void MainWindow::saveThenCloseSchemes()
         const QString fileName = m_context.schemesForSave.value(scheme);
         if (!scheme->saveToFile(fileName))
         {
-            m_context.forClose.removeAll(scheme);
+            m_context.schemesForClose.removeAll(scheme);
             errors.append(fileName);
         }
     }
 
-    foreach (SchemeWidget *scheme, m_context.forClose)
+    foreach (SchemeWidget *scheme, m_context.schemesForClose)
         scheme->deleteLater();
 
     if (!errors.isEmpty())
@@ -365,7 +365,7 @@ void MainWindow::saveSchemes(const QList<SchemeWidget *> &schemes, bool askFileN
 void MainWindow::closeSchemes(const QList<SchemeWidget *> &schemes, bool exitAfterClose)
 {
     m_context = SaveCloseContext();
-    m_context.forClose = schemes;
+    m_context.schemesForClose = schemes;
     m_context.exitAfterClose = exitAfterClose;
 
     querySchemesForSave();

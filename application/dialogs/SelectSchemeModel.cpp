@@ -17,18 +17,18 @@ int SelectSchemeModel::rowCount(const QModelIndex &parent) const
 
 QVariant SelectSchemeModel::data(const QModelIndex &index, int role) const
 {
-    SchemeWidget * const key = m_schemes.keys().at(index.row());
+    SchemeWidget * const scheme = m_schemes.keys().at(index.row());
 
     switch (role)
     {
     case Qt::DisplayRole:
-        return key->fileName();
+        return scheme->fileName();
 
     case Qt::DecorationRole:
         return QIcon::fromTheme("text-x-generic");
 
     case Qt::CheckStateRole:
-        return m_schemes.value(key) ? Qt::Checked : Qt::Unchecked;
+        return m_schemes.value(scheme) ? Qt::Checked : Qt::Unchecked;
 
     default:
         break;
@@ -39,21 +39,20 @@ QVariant SelectSchemeModel::data(const QModelIndex &index, int role) const
 
 bool SelectSchemeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    SchemeWidget * const key = m_schemes.keys().at(index.row());
+    SchemeWidget * const scheme = m_schemes.keys().at(index.row());
 
-    if (role == Qt::CheckStateRole)
-    {
-        m_schemes[key] = value.toBool();
-        emit dataChanged(index, index);
-        return true;
-    }
+    if (role != Qt::CheckStateRole)
+        return false;
 
-    return false;
+    m_schemes[scheme] = value.toBool();
+    emit dataChanged(index, index);
+    return true;
 }
 
 Qt::ItemFlags SelectSchemeModel::flags(const QModelIndex &index) const
 {
-    return index.isValid() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable : Qt::NoItemFlags;
+    Q_UNUSED(index)
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
 }
 
 QList<SchemeWidget *> SelectSchemeModel::schemes() const

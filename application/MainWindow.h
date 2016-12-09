@@ -58,7 +58,8 @@ private:
         void setSchemesForSave(const QList<SchemeWidget *> &schemes, bool askFileName);
         QList<SchemeWidget *> modifiedSchemes() const;
         SchemeWidget *schemeForSave() const;
-        QList<SchemeWidget *> forClose;
+
+        QList<SchemeWidget *> schemesForClose;
         QHash<SchemeWidget *, QString> schemesForSave;
         bool exitAfterClose;
     };

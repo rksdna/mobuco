@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QDateTime>
 #include <QTranslator>
 #include <QLibraryInfo>
@@ -14,14 +13,6 @@ int main(int argc, char *argv[])
     application.setApplicationVersion(DEPLOY_VERSION);
     application.setOrganizationDomain(DEPLOY_DOMAIN);
     application.setOrganizationName(DEPLOY_ORGANIZATION);
-
-    qDebug() << DEPLOY_NAME;
-    qDebug() << DEPLOY_DOMAIN;
-    qDebug() << DEPLOY_ORGANIZATION;
-    qDebug() << DEPLOY_BIN_DIR;
-    qDebug() << DEPLOY_DATA_DIR;
-    qDebug() << DEPLOY_VERSION;
-    qDebug() << DEPLOY_DATE;
 
     QTranslator qtTranslator;
     qtTranslator.load("qt_" + QLocale::system().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath));

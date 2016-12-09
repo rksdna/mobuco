@@ -16,14 +16,12 @@ SchemeModel::SchemeModel(QObject *parent) :
 int SchemeModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-
     return m_entries.count();
 }
 
 int SchemeModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-
     return count();
 }
 
