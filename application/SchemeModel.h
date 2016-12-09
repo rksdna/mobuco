@@ -1,14 +1,14 @@
-#ifndef SCHEDULEMODEL_H
-#define SCHEDULEMODEL_H
+#ifndef SCHEMEMODEL_H
+#define SCHEMEMODEL_H
 
 #include <QAbstractTableModel>
-#include "ScheduleEntry.h"
+#include "SchemeEntry.h"
 
-class ScheduleModel : public QAbstractTableModel
+class SchemeModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit ScheduleModel(QObject *parent = 0);
+    explicit SchemeModel(QObject *parent = 0);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -26,7 +26,7 @@ private:
     int count() const;
 
 private:
-    QList<ScheduleEntry> m_entries;
+    QList<SchemeEntry> m_entries;
 };
 
-#endif // SCHEDULEMODEL_H
+#endif // SCHEMEMODEL_H

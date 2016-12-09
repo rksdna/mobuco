@@ -1,12 +1,12 @@
 #include "Delegate.h"
-#include "ScheduleDelegate.h"
+#include "SchemeDelegate.h"
 
-ScheduleDelegate::ScheduleDelegate(QObject *parent) :
+SchemeDelegate::SchemeDelegate(QObject *parent) :
     QItemDelegate(parent)
 {
 }
 
-QWidget *ScheduleDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *SchemeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
     if (delegate)
@@ -15,7 +15,7 @@ QWidget *ScheduleDelegate::createEditor(QWidget *parent, const QStyleOptionViewI
     return QItemDelegate::createEditor(parent, option, index);
 }
 
-void ScheduleDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) const
+void SchemeDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) const
 {
     DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
     if (delegate)
@@ -24,7 +24,7 @@ void ScheduleDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) 
     return QItemDelegate::destroyEditor(editor, index);
 }
 
-void ScheduleDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void SchemeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
     if (delegate)
@@ -33,7 +33,7 @@ void ScheduleDelegate::setEditorData(QWidget *editor, const QModelIndex &index) 
         QItemDelegate::setEditorData(editor, index);
 }
 
-void ScheduleDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void SchemeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
     if (delegate)

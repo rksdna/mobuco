@@ -2,34 +2,34 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "Delegate.h"
-#include "ScheduleModel.h"
+#include "SchemeModel.h"
 
-ScheduleModel::ScheduleModel(QObject *parent) :
+SchemeModel::SchemeModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
-    m_entries.append(ScheduleEntry(0));
-    m_entries.append(ScheduleEntry(1));
-    m_entries.append(ScheduleEntry(2));
-    m_entries.append(ScheduleEntry(3));
+    m_entries.append(SchemeEntry(0));
+    m_entries.append(SchemeEntry(1));
+    m_entries.append(SchemeEntry(2));
+    m_entries.append(SchemeEntry(3));
 }
 
-int ScheduleModel::rowCount(const QModelIndex &parent) const
+int SchemeModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
 
     return m_entries.count();
 }
 
-int ScheduleModel::columnCount(const QModelIndex &parent) const
+int SchemeModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
 
     return count();
 }
 
-QVariant ScheduleModel::data(const QModelIndex &index, int role) const
+QVariant SchemeModel::data(const QModelIndex &index, int role) const
 {
-    const ScheduleEntry &entry = m_entries.at(index.row());
+    const SchemeEntry &entry = m_entries.at(index.row());
 
     if (role == Qt::DisplayRole)
         return entry.value(index.column());
@@ -43,9 +43,9 @@ QVariant ScheduleModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool ScheduleModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool SchemeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    ScheduleEntry &entry = m_entries[index.row()];
+    SchemeEntry &entry = m_entries[index.row()];
 
     if (role == Qt::EditRole)
     {
@@ -59,29 +59,29 @@ bool ScheduleModel::setData(const QModelIndex &index, const QVariant &value, int
     return false;
 }
 
-QVariant ScheduleModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant SchemeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     return QAbstractTableModel::headerData(section, orientation, role);
 }
 
-Qt::ItemFlags ScheduleModel::flags(const QModelIndex &index) const
+Qt::ItemFlags SchemeModel::flags(const QModelIndex &index) const
 {
     Q_UNUSED(index)
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 }
 
-bool ScheduleModel::insertRows(int row, int count, const QModelIndex &parent)
+bool SchemeModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent)
 
     beginInsertRows(parent, row, row + count - 1);
     while (count--)
-        m_entries.insert(row, ScheduleEntry());
+        m_entries.insert(row, SchemeEntry());
     endInsertRows();
     return true;
 }
 
-bool ScheduleModel::removeRows(int row, int count, const QModelIndex &parent)
+bool SchemeModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(parent)
 
@@ -92,7 +92,7 @@ bool ScheduleModel::removeRows(int row, int count, const QModelIndex &parent)
     return true;
 }
 
-bool ScheduleModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
+bool SchemeModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int count, const QModelIndex &destinationParent, int destinationChild)
 {
     Q_UNUSED(sourceParent)
     Q_UNUSED(destinationParent)
@@ -117,14 +117,14 @@ bool ScheduleModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int
     return true;
 }
 
-void ScheduleModel::readFromJson(const QJsonDocument &document)
+void SchemeModel::readFromJson(const QJsonDocument &document)
 {
     beginResetModel();
 
     m_entries.clear();
     foreach (const QJsonValue &value, document.array())
     {
-        ScheduleEntry entry;
+        SchemeEntry entry;
         entry.readFromJson(value.toObject());
         m_entries.append(entry);
     }
@@ -132,19 +132,19 @@ void ScheduleModel::readFromJson(const QJsonDocument &document)
     endResetModel();
 }
 
-QJsonDocument ScheduleModel::writeToJson() const
+QJsonDocument SchemeModel::writeToJson() const
 {
     QJsonArray array;
-    foreach (const ScheduleEntry &entry, m_entries)
+    foreach (const SchemeEntry &entry, m_entries)
         array.append(entry.writeToJson());
 
     return QJsonDocument(array);
 }
 
-int ScheduleModel::count() const
+int SchemeModel::count() const
 {
     int count = 0;
-    foreach (const ScheduleEntry &entry, m_entries)
+    foreach (const SchemeEntry &entry, m_entries)
         count = qMax(count, entry.count());
 
     return count;

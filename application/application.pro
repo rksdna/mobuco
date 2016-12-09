@@ -17,29 +17,29 @@ INCLUDEPATH += \
 SOURCES += \
     main.cpp \
     MainWindow.cpp \
-    ScheduleWidget.cpp \
-    dialogs/OpenScheduleDialog.cpp \
-    dialogs/SaveScheduleDialog.cpp \
-    dialogs/PickScheduleDialog.cpp \
-    dialogs/PickScheduleModel.cpp \
-    ScheduleModel.cpp \
-    ScheduleEntry.cpp \
-    ScheduleDelegate.cpp \
     delegates/Delegate.cpp \
-    delegates/EnumerationDelegate.cpp
+    delegates/EnumerationDelegate.cpp \
+    SchemeDelegate.cpp \
+    SchemeModel.cpp \
+    SchemeEntry.cpp \
+    SchemeWidget.cpp \
+    dialogs/OpenSchemeDialog.cpp \
+    dialogs/PickSchemeDialog.cpp \
+    dialogs/PickSchemeModel.cpp \
+    dialogs/SaveSchemeDialog.cpp
 
 HEADERS += \
     MainWindow.h \
-    ScheduleWidget.h \
-    dialogs/OpenScheduleDialog.h \
-    dialogs/SaveScheduleDialog.h \
-    dialogs/PickScheduleDialog.h \
-    dialogs/PickScheduleModel.h \
-    ScheduleModel.h \
-    ScheduleEntry.h \
-    ScheduleDelegate.h \
     delegates/Delegate.h \
-    delegates/EnumerationDelegate.h
+    delegates/EnumerationDelegate.h \
+    SchemeEntry.h \
+    SchemeDelegate.h \
+    SchemeWidget.h \
+    SchemeModel.h \
+    dialogs/OpenSchemeDialog.h \
+    dialogs/PickSchemeDialog.h \
+    dialogs/PickSchemeModel.h \
+    dialogs/SaveSchemeDialog.h
 
 RESOURCES += \
     application.qrc

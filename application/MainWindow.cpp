@@ -7,18 +7,18 @@
 #include <QCloseEvent>
 #include <QApplication>
 #include "MainWindow.h"
-#include "ScheduleWidget.h"
-#include "SaveScheduleDialog.h"
-#include "OpenScheduleDialog.h"
-#include "PickScheduleDialog.h"
+#include "SchemeWidget.h"
+#include "SaveSchemeDialog.h"
+#include "OpenSchemeDialog.h"
+#include "PickSchemeDialog.h"
 
 template<typename T>
-static QList<T> toList(T item)
+static QList<T> toList(T value)
 {
-    QList<T> items;
-    items.append(item);
+    QList<T> result;
+    result.append(value);
 
-    return items;
+    return result;
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -121,10 +121,10 @@ void MainWindow::hideEvent(QHideEvent *event)
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (!allItems().isEmpty())
+    if (!allSchemes().isEmpty())
     {
         event->ignore();
-        closeItems(allItems(), true);
+        closeSchemes(allSchemes(), true);
         return;
     }
 
@@ -134,113 +134,113 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::newFile()
 {
     static int count = 1;
-    appendItem(new ScheduleWidget(tr("new-%1.json").arg(count++)));
+    appendScheme(new SchemeWidget(tr("new-%1.json").arg(count++)));
 }
 
 void MainWindow::openFile()
 {
-    OpenScheduleDialog * const dialog  = new OpenScheduleDialog(window());
-    connect(dialog, &OpenScheduleDialog::finished, dialog, &OpenScheduleDialog::deleteLater);
-    connect(dialog, &OpenScheduleDialog::filesSelected, this, &MainWindow::openItems);
+    OpenSchemeDialog * const dialog  = new OpenSchemeDialog(window());
+    connect(dialog, &OpenSchemeDialog::finished, dialog, &OpenSchemeDialog::deleteLater);
+    connect(dialog, &OpenSchemeDialog::filesSelected, this, &MainWindow::openSchemes);
 
     dialog->open();
 }
 
 void MainWindow::saveFile()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        saveItems(toList(item), false);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        saveSchemes(toList(scheme), false);
 }
 
 void MainWindow::saveFileAs()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        saveItems(toList(item), true);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        saveSchemes(toList(scheme), true);
 }
 
 void MainWindow::saveAllFiles()
 {
-    saveItems(allItems(), false);
+    saveSchemes(allSchemes(), false);
 }
 
 void MainWindow::closeFile()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        closeItems(toList(item), false);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        closeSchemes(toList(scheme), false);
 }
 
 void MainWindow::closeFileByIndex(int index)
 {
-    closeItems(toList(itemByIndex(index)), false);
+    closeSchemes(toList(schemeByIndex(index)), false);
 }
 
 void MainWindow::closeAllFiles()
 {
-    closeItems(allItems(), false);
+    closeSchemes(allSchemes(), false);
 }
 
 void MainWindow::insertEntry()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        item->insertEntry();
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        scheme->insertEntry();
 }
 
 void MainWindow::removeEntries()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        item->removeEntries();
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        scheme->removeEntries();
 }
 
 void MainWindow::moveEntriesToTop()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        item->moveEntries(ScheduleWidget::MoveToTop);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        scheme->moveEntries(SchemeWidget::MoveToTop);
 }
 
 void MainWindow::moveEntriesUp()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        item->moveEntries(ScheduleWidget::MoveUp);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        scheme->moveEntries(SchemeWidget::MoveUp);
 }
 
 void MainWindow::moveEntriesDown()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        item->moveEntries(ScheduleWidget::MoveDown);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        scheme->moveEntries(SchemeWidget::MoveDown);
 }
 
 void MainWindow::moveEntriesToBottom()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    if (item)
-        item->moveEntries(ScheduleWidget::MoveToBottom);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    if (scheme)
+        scheme->moveEntries(SchemeWidget::MoveToBottom);
 }
 
 void MainWindow::about()
 {
 }
 
-void MainWindow::updateTabHeader(ScheduleWidget *item)
+void MainWindow::updateTabHeader(SchemeWidget *scheme)
 {
-    const QString title = (item->isModified() ? tr("%1*") : tr("%1")).arg(item->fileName());
-    m_widget->setTabText(m_widget->indexOf(item), title);
+    const QString title = (scheme->isModified() ? tr("%1*") : tr("%1")).arg(scheme->fileName());
+    m_widget->setTabText(m_widget->indexOf(scheme), title);
 
     updateWindowHeader();
 }
 
 void MainWindow::updateWindowHeader()
 {
-    ScheduleWidget * const item = itemByIndex(m_widget->currentIndex());
-    setWindowFilePath(item ? item->fileName() : QString());
-    setWindowModified(item ? item->isModified() : false);
+    SchemeWidget * const scheme = schemeByIndex(m_widget->currentIndex());
+    setWindowFilePath(scheme ? scheme->fileName() : QString());
+    setWindowModified(scheme ? scheme->isModified() : false);
 }
 
 void MainWindow::showErrorMessage(const QString &text)
@@ -253,14 +253,14 @@ void MainWindow::showErrorMessage(const QString &text)
     box->open();
 }
 
-void MainWindow::openItems(const QStringList &fileNames)
+void MainWindow::openSchemes(const QStringList &fileNames)
 {
     QStringList errors;
     foreach (const QString &fileName, fileNames)
     {
-        QScopedPointer<ScheduleWidget> item(new ScheduleWidget(fileName));
-        if (item->loadFromFile(fileName))
-            appendItem(item.take());
+        QScopedPointer<SchemeWidget> scheme(new SchemeWidget(fileName));
+        if (scheme->loadFromFile(fileName))
+            appendScheme(scheme.take());
         else
             errors.append(fileName);
     }
@@ -269,77 +269,77 @@ void MainWindow::openItems(const QStringList &fileNames)
         showErrorMessage(tr("Can't open:\n%1").arg(errors.join("\n")));
 }
 
-void MainWindow::queryItemsForSave()
+void MainWindow::querySchemesForSave()
 {
-    QList<ScheduleWidget *> modified;
-    foreach (ScheduleWidget *item, m_itemsForClose)
+    QList<SchemeWidget *> modified;
+    foreach (SchemeWidget *scheme, m_schemesForClose)
     {
-        if (item->isModified())
-            modified.append(item);
+        if (scheme->isModified())
+            modified.append(scheme);
     }
 
     if (!modified.isEmpty())
     {
-        PickScheduleDialog * const dialog = new PickScheduleDialog(tr("Save files before close?"), modified, this);
-        connect(dialog, &PickScheduleDialog::finished, dialog, &PickScheduleDialog::deleteLater);
-        connect(dialog, &PickScheduleDialog::itemsSelected, this, &MainWindow::setItemsForSave);
+        PickSchemeDialog * const dialog = new PickSchemeDialog(tr("Save files before close?"), modified, this);
+        connect(dialog, &PickSchemeDialog::finished, dialog, &PickSchemeDialog::deleteLater);
+        connect(dialog, &PickSchemeDialog::schemesSelected, this, &MainWindow::setSchemesForSave);
 
         dialog->open();
         return;
     }
 
-    setItemsForSave(modified);
+    setSchemesForSave(modified);
 }
 
-void MainWindow::setItemsForSave(const QList<ScheduleWidget *> &items)
+void MainWindow::setSchemesForSave(const QList<SchemeWidget *> &schemes)
 {
-    m_itemsForSave = items;
+    m_schemesForSave = schemes;
 
-    queryItemFileName();
+    querySchemeFileName();
 }
 
-void MainWindow::queryItemFileName()
+void MainWindow::querySchemeFileName()
 {
-    while (!m_itemsForSave.isEmpty())
+    while (!m_schemesForSave.isEmpty())
     {
-        const ScheduleWidget *item = m_itemsForSave.first();
-        if (item->isNew() || m_askFileName)
+        const SchemeWidget *scheme = m_schemesForSave.first();
+        if (scheme->isNew() || m_askFileName)
         {
-            SaveScheduleDialog * const dialog  = new SaveScheduleDialog(item->fileName(), this);
-            connect(dialog, &SaveScheduleDialog::finished, dialog, &SaveScheduleDialog::deleteLater);
-            connect(dialog, &SaveScheduleDialog::fileSelected, this, &MainWindow::setItemFileName);
-            connect(dialog, &SaveScheduleDialog::accepted, this, &MainWindow::queryItemFileName);
+            SaveSchemeDialog * const dialog  = new SaveSchemeDialog(scheme->fileName(), this);
+            connect(dialog, &SaveSchemeDialog::finished, dialog, &SaveSchemeDialog::deleteLater);
+            connect(dialog, &SaveSchemeDialog::fileSelected, this, &MainWindow::setSchemeFileName);
+            connect(dialog, &SaveSchemeDialog::accepted, this, &MainWindow::querySchemeFileName);
 
             dialog->open();
             return;
         }
 
-        setItemFileName(item->fileName());
+        setSchemeFileName(scheme->fileName());
     }
 
-    saveThenCloseItems();
+    saveThenCloseSchemes();
 }
 
-void MainWindow::setItemFileName(const QString &fileName)
+void MainWindow::setSchemeFileName(const QString &fileName)
 {
-    m_items.insert(m_itemsForSave.takeFirst(), fileName);
+    m_schemes.insert(m_schemesForSave.takeFirst(), fileName);
 }
 
-void MainWindow::saveThenCloseItems()
+void MainWindow::saveThenCloseSchemes()
 {
     QStringList errors;
-    foreach (ScheduleWidget *item, m_items.keys())
+    foreach (SchemeWidget *scheme, m_schemes.keys())
     {
-        const QString fileName = m_items.value(item);
-        if (!item->saveToFile(fileName))
+        const QString fileName = m_schemes.value(scheme);
+        if (!scheme->saveToFile(fileName))
         {
-            m_itemsForClose.removeAll(item);
+            m_schemesForClose.removeAll(scheme);
             errors.append(fileName);
         }
     }
 
-    foreach (ScheduleWidget *item, m_itemsForClose)
-        item->deleteLater();
+    foreach (SchemeWidget *scheme, m_schemesForClose)
+        scheme->deleteLater();
 
     if (!errors.isEmpty())
     {
@@ -351,45 +351,45 @@ void MainWindow::saveThenCloseItems()
         emit closeRequested();
 }
 
-void MainWindow::appendItem(ScheduleWidget *item)
+void MainWindow::appendScheme(SchemeWidget *scheme)
 {
-    m_widget->addTab(item, QIcon::fromTheme("text-x-generic"), QString());
-    connect(item, &ScheduleWidget::statusChanged, this, &MainWindow::updateTabHeader);
-    updateTabHeader(item);
+    m_widget->addTab(scheme, QIcon::fromTheme("text-x-generic"), QString());
+    connect(scheme, &SchemeWidget::statusChanged, this, &MainWindow::updateTabHeader);
+    updateTabHeader(scheme);
 }
 
-void MainWindow::saveItems(const QList<ScheduleWidget *> &items, bool askFileName)
+void MainWindow::saveSchemes(const QList<SchemeWidget *> &schemes, bool askFileName)
 {
-    m_itemsForClose.clear();
-    m_itemsForSave = items;
-    m_items.clear();
+    m_schemesForClose.clear();
+    m_schemesForSave = schemes;
+    m_schemes.clear();
     m_askFileName = askFileName;
     m_exitAfterClose = false;
 
-    queryItemFileName();
+    querySchemeFileName();
 }
 
-void MainWindow::closeItems(const QList<ScheduleWidget *> &items, bool exitAfterClose)
+void MainWindow::closeSchemes(const QList<SchemeWidget *> &schemes, bool exitAfterClose)
 {
-    m_itemsForClose = items;
-    m_itemsForSave.clear();
-    m_items.clear();
+    m_schemesForClose = schemes;
+    m_schemesForSave.clear();
+    m_schemes.clear();
     m_askFileName = false;
     m_exitAfterClose = exitAfterClose;
 
-    queryItemsForSave();
+    querySchemesForSave();
 }
 
-QList<ScheduleWidget *> MainWindow::allItems() const
+QList<SchemeWidget *> MainWindow::allSchemes() const
 {
-    QList<ScheduleWidget *> items;
+    QList<SchemeWidget *> schemes;
     for (int index = 0; index < m_widget->count(); index++)
-        items.append(itemByIndex(index));
+        schemes.append(schemeByIndex(index));
 
-    return items;
+    return schemes;
 }
 
-ScheduleWidget *MainWindow::itemByIndex(int index) const
+SchemeWidget *MainWindow::schemeByIndex(int index) const
 {
-    return qobject_cast<ScheduleWidget *>(m_widget->widget(index));
+    return qobject_cast<SchemeWidget *>(m_widget->widget(index));
 }

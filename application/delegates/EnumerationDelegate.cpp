@@ -1,15 +1,15 @@
 #include <QComboBox>
 #include "EnumerationDelegate.h"
 
-EnumerationDelegate::EnumerationDelegate(const QString &items)
-    : m_items(items)
+EnumerationDelegate::EnumerationDelegate(const QString &schemes)
+    : m_schemes(schemes)
 {
 }
 
 QWidget *EnumerationDelegate::createWidget(QWidget *parent) const
 {
     QComboBox *e = new QComboBox(parent);
-    e->addItems(m_items.split(";"));
+    e->addItems(m_schemes.split(";"));
     return e;
 }
 

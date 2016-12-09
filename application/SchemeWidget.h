@@ -1,13 +1,13 @@
-#ifndef SCHEDULEWIDGET_H
-#define SCHEDULEWIDGET_H
+#ifndef SCHEMEWIDGET_H
+#define SCHEMEWIDGET_H
 
 #include <QWidget>
 #include <QPersistentModelIndex>
 
 class QTableView;
-class ScheduleModel;
+class SchemeModel;
 
-class ScheduleWidget : public QWidget
+class SchemeWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -20,7 +20,7 @@ public:
     };
 
 public:
-    explicit ScheduleWidget(const QString &fileName, QWidget *parent = 0);
+    explicit SchemeWidget(const QString &fileName, QWidget *parent = 0);
     QString fileName() const;
     bool isNew() const;
     bool isModified() const;
@@ -31,7 +31,7 @@ public:
     void moveEntries(Move move);
 
 signals:
-    void statusChanged(ScheduleWidget *item);
+    void statusChanged(SchemeWidget *scheme);
 
 private slots:
     void changeStatus();
@@ -41,11 +41,11 @@ private:
     void setStatus(const QString &fileName, bool isNew, bool isModified);
 
 private:
-    ScheduleModel * const m_model;
+    SchemeModel * const m_model;
     QTableView * const m_view;
     QString m_fileName;
     bool m_isNew;
     bool m_isModified;
 };
 
-#endif // SCHEDULEWIDGET_H
+#endif // SCHEMEWIDGET_H

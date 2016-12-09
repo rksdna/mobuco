@@ -5,7 +5,7 @@
 #include <QMainWindow>
 
 class QTabWidget;
-class ScheduleWidget;
+class SchemeWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -36,28 +36,28 @@ private slots:
     void moveEntriesDown();
     void moveEntriesToBottom();
     void about();
-    void updateTabHeader(ScheduleWidget *item);
+    void updateTabHeader(SchemeWidget *scheme);
     void updateWindowHeader();
     void showErrorMessage(const QString &text);
-    void openItems(const QStringList &fileNames);
-    void queryItemsForSave();
-    void setItemsForSave(const QList<ScheduleWidget *> &items);
-    void queryItemFileName();
-    void setItemFileName(const QString &fileName);
-    void saveThenCloseItems();
+    void openSchemes(const QStringList &fileNames);
+    void querySchemesForSave();
+    void setSchemesForSave(const QList<SchemeWidget *> &schemes);
+    void querySchemeFileName();
+    void setSchemeFileName(const QString &fileName);
+    void saveThenCloseSchemes();
 
 private:
-    void appendItem(ScheduleWidget *item);
-    void saveItems(const QList<ScheduleWidget *> &items, bool askFileName);
-    void closeItems(const QList<ScheduleWidget *> &items, bool exitAfterClose);
-    QList<ScheduleWidget *> allItems() const;
-    ScheduleWidget *itemByIndex(int index) const;
+    void appendScheme(SchemeWidget *scheme);
+    void saveSchemes(const QList<SchemeWidget *> &schemes, bool askFileName);
+    void closeSchemes(const QList<SchemeWidget *> &schemes, bool exitAfterClose);
+    QList<SchemeWidget *> allSchemes() const;
+    SchemeWidget *schemeByIndex(int index) const;
 
 private:
     QTabWidget * const m_widget;
-    QList<ScheduleWidget *> m_itemsForClose;
-    QList<ScheduleWidget *> m_itemsForSave;
-    QHash<ScheduleWidget *, QString> m_items;
+    QList<SchemeWidget *> m_schemesForClose;
+    QList<SchemeWidget *> m_schemesForSave;
+    QHash<SchemeWidget *, QString> m_schemes;
     bool m_askFileName;
     bool m_exitAfterClose;
 };

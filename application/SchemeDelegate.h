@@ -1,17 +1,17 @@
-#ifndef SCHEDULEDELEGATE_H
-#define SCHEDULEDELEGATE_H
+#ifndef SCHEMEDELEGATE_H
+#define SCHEMEDELEGATE_H
 
 #include <QItemDelegate>
 
-class ScheduleDelegate : public QItemDelegate
+class SchemeDelegate : public QItemDelegate
 {
     Q_OBJECT
 public:
-    explicit ScheduleDelegate(QObject *parent = 0);
+    explicit SchemeDelegate(QObject *parent = 0);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void destroyEditor(QWidget *editor, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 };
 
-#endif // SCHEDULEDELEGATE_H
+#endif // SCHEMEDELEGATE_H

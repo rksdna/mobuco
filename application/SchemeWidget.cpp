@@ -4,25 +4,25 @@
 #include <QTableView>
 #include <QHeaderView>
 #include <QJsonDocument>
-#include "ScheduleModel.h"
-#include "ScheduleWidget.h"
-#include "ScheduleDelegate.h"
+#include "SchemeModel.h"
+#include "SchemeWidget.h"
+#include "SchemeDelegate.h"
 
-ScheduleWidget::ScheduleWidget(const QString &fileName, QWidget *parent)
+SchemeWidget::SchemeWidget(const QString &fileName, QWidget *parent)
     : QWidget(parent),
-      m_model(new ScheduleModel(this)),
+      m_model(new SchemeModel(this)),
       m_view(new QTableView),
       m_fileName(fileName),
       m_isNew(true),
       m_isModified(false)
 {
-    connect(m_model, &ScheduleModel::dataChanged, this, &ScheduleWidget::changeStatus);
-    connect(m_model, &ScheduleModel::rowsInserted, this, &ScheduleWidget::changeStatus);
-    connect(m_model, &ScheduleModel::rowsInserted, this, &ScheduleWidget::selectInsertedRows);
-    connect(m_model, &ScheduleModel::rowsRemoved, this, &ScheduleWidget::changeStatus);
-    connect(m_model, &ScheduleModel::rowsMoved, this, &ScheduleWidget::changeStatus);
+    connect(m_model, &SchemeModel::dataChanged, this, &SchemeWidget::changeStatus);
+    connect(m_model, &SchemeModel::rowsInserted, this, &SchemeWidget::changeStatus);
+    connect(m_model, &SchemeModel::rowsInserted, this, &SchemeWidget::selectInsertedRows);
+    connect(m_model, &SchemeModel::rowsRemoved, this, &SchemeWidget::changeStatus);
+    connect(m_model, &SchemeModel::rowsMoved, this, &SchemeWidget::changeStatus);
 
-    m_view->setItemDelegate(new ScheduleDelegate(this));
+    m_view->setItemDelegate(new SchemeDelegate(this));
     m_view->setSelectionBehavior(QTableView::SelectRows);
     m_view->setSelectionMode(QTableView::ContiguousSelection);
 
@@ -35,22 +35,22 @@ ScheduleWidget::ScheduleWidget(const QString &fileName, QWidget *parent)
     layout->addWidget(m_view);
 }
 
-QString ScheduleWidget::fileName() const
+QString SchemeWidget::fileName() const
 {
     return m_fileName;
 }
 
-bool ScheduleWidget::isNew() const
+bool SchemeWidget::isNew() const
 {
     return m_isNew;
 }
 
-bool ScheduleWidget::isModified() const
+bool SchemeWidget::isModified() const
 {
     return m_isModified;
 }
 
-bool ScheduleWidget::loadFromFile(const QString &fileName)
+bool SchemeWidget::loadFromFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
@@ -66,7 +66,7 @@ bool ScheduleWidget::loadFromFile(const QString &fileName)
     return true;
 }
 
-bool ScheduleWidget::saveToFile(const QString &fileName)
+bool SchemeWidget::saveToFile(const QString &fileName)
 {
     QSaveFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
@@ -81,12 +81,12 @@ bool ScheduleWidget::saveToFile(const QString &fileName)
     return true;
 }
 
-void ScheduleWidget::insertEntry()
+void SchemeWidget::insertEntry()
 {
     m_model->insertRow(m_model->rowCount());
 }
 
-void ScheduleWidget::removeEntries()
+void SchemeWidget::removeEntries()
 {
     QModelIndexList indexes = m_view->selectionModel()->selectedRows();
     if (!indexes.isEmpty())
@@ -96,7 +96,7 @@ void ScheduleWidget::removeEntries()
     }
 }
 
-void ScheduleWidget::moveEntries(Move move)
+void SchemeWidget::moveEntries(Move move)
 {
     QModelIndexList indexes = m_view->selectionModel()->selectedRows();
     if (!indexes.isEmpty())
@@ -104,16 +104,16 @@ void ScheduleWidget::moveEntries(Move move)
         qSort(indexes);
         switch (move)
         {
-        case ScheduleWidget::MoveToTop:
+        case SchemeWidget::MoveToTop:
             m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), 0);
             break;
-        case ScheduleWidget::MoveUp:
+        case SchemeWidget::MoveUp:
             m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), indexes.first().row() - 1);
             break;
-        case ScheduleWidget::MoveDown:
+        case SchemeWidget::MoveDown:
             m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), indexes.last().row() + 2);
             break;
-        case ScheduleWidget::MoveToBottom:
+        case SchemeWidget::MoveToBottom:
             m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), m_model->rowCount());
             break;
         default:
@@ -122,12 +122,12 @@ void ScheduleWidget::moveEntries(Move move)
     }
 }
 
-void ScheduleWidget::changeStatus()
+void SchemeWidget::changeStatus()
 {
     setStatus(m_fileName, m_isNew, true);
 }
 
-void ScheduleWidget::selectInsertedRows(const QModelIndex &index, int first, int last)
+void SchemeWidget::selectInsertedRows(const QModelIndex &index, int first, int last)
 {
     Q_UNUSED(index)
     Q_UNUSED(first)
@@ -135,7 +135,7 @@ void ScheduleWidget::selectInsertedRows(const QModelIndex &index, int first, int
     m_view->selectRow(last);
 }
 
-void ScheduleWidget::setStatus(const QString &fileName, bool isNew, bool isModified)
+void SchemeWidget::setStatus(const QString &fileName, bool isNew, bool isModified)
 {
     m_fileName = fileName;
     m_isNew = isNew;

@@ -1,30 +1,30 @@
 #include <QJsonArray>
 #include <QJsonObject>
-#include "ScheduleEntry.h"
+#include "SchemeEntry.h"
 #include "EnumerationDelegate.h"
 
-ScheduleEntry::ScheduleEntry(int size)
+SchemeEntry::SchemeEntry(int size)
     : m_data(size)
 {
 }
 
-int ScheduleEntry::count() const
+int SchemeEntry::count() const
 {
     return m_data.count();
 }
 
-QVariant ScheduleEntry::value(int column) const
+QVariant SchemeEntry::value(int column) const
 {
     return m_data.value(column, -200);
 }
 
-bool ScheduleEntry::setValue(int column, const QVariant &value)
+bool SchemeEntry::setValue(int column, const QVariant &value)
 {
     m_data[column] = value.toInt();
     return true;
 }
 
-QVariant ScheduleEntry::delegate(int column) const
+QVariant SchemeEntry::delegate(int column) const
 {
     static DelegateSharedPointer da(new EnumerationDelegate("A;B;C"));
     static DelegateSharedPointer db(new EnumerationDelegate("q;w;e"));
@@ -38,7 +38,7 @@ QVariant ScheduleEntry::delegate(int column) const
     return QVariant::fromValue(db);
 }
 
-void ScheduleEntry::readFromJson(const QJsonObject &object)
+void SchemeEntry::readFromJson(const QJsonObject &object)
 {
     QJsonArray data = object["data"].toArray();
 
@@ -47,7 +47,7 @@ void ScheduleEntry::readFromJson(const QJsonObject &object)
         m_data[i] = data.at(i).toInt();
 }
 
-QJsonObject ScheduleEntry::writeToJson() const
+QJsonObject SchemeEntry::writeToJson() const
 {
     QJsonArray data;
     for (int i = 0; i < m_data.count(); i++)
