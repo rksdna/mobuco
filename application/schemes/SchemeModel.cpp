@@ -7,10 +7,10 @@
 SchemeModel::SchemeModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
-    m_entries.append(SchemeEntry(0));
-    m_entries.append(SchemeEntry(1));
-    m_entries.append(SchemeEntry(2));
-    m_entries.append(SchemeEntry(3));
+    m_entries.append(SchemeItem(0));
+    m_entries.append(SchemeItem(1));
+    m_entries.append(SchemeItem(2));
+    m_entries.append(SchemeItem(3));
 }
 
 int SchemeModel::rowCount(const QModelIndex &parent) const
@@ -29,7 +29,7 @@ int SchemeModel::columnCount(const QModelIndex &parent) const
 
 QVariant SchemeModel::data(const QModelIndex &index, int role) const
 {
-    const SchemeEntry &entry = m_entries.at(index.row());
+    const SchemeItem &entry = m_entries.at(index.row());
 
     if (role == Qt::DisplayRole)
         return entry.value(index.column());
@@ -45,7 +45,7 @@ QVariant SchemeModel::data(const QModelIndex &index, int role) const
 
 bool SchemeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    SchemeEntry &entry = m_entries[index.row()];
+    SchemeItem &entry = m_entries[index.row()];
 
     if (role == Qt::EditRole)
     {
@@ -76,7 +76,7 @@ bool SchemeModel::insertRows(int row, int count, const QModelIndex &parent)
 
     beginInsertRows(parent, row, row + count - 1);
     while (count--)
-        m_entries.insert(row, SchemeEntry());
+        m_entries.insert(row, SchemeItem());
     endInsertRows();
     return true;
 }
@@ -124,7 +124,7 @@ void SchemeModel::readFromJson(const QJsonDocument &document)
     m_entries.clear();
     foreach (const QJsonValue &value, document.array())
     {
-        SchemeEntry entry;
+        SchemeItem entry;
         entry.readFromJson(value.toObject());
         m_entries.append(entry);
     }
@@ -135,7 +135,7 @@ void SchemeModel::readFromJson(const QJsonDocument &document)
 QJsonDocument SchemeModel::writeToJson() const
 {
     QJsonArray array;
-    foreach (const SchemeEntry &entry, m_entries)
+    foreach (const SchemeItem &entry, m_entries)
         array.append(entry.writeToJson());
 
     return QJsonDocument(array);
@@ -144,7 +144,7 @@ QJsonDocument SchemeModel::writeToJson() const
 int SchemeModel::count() const
 {
     int count = 0;
-    foreach (const SchemeEntry &entry, m_entries)
+    foreach (const SchemeItem &entry, m_entries)
         count = qMax(count, entry.count());
 
     return count;

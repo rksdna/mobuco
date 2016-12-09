@@ -4,12 +4,12 @@
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QDialogButtonBox>
-#include "PickSchemeModel.h"
-#include "PickSchemeDialog.h"
+#include "SelectSchemeModel.h"
+#include "SelectSchemeDialog.h"
 
-PickSchemeDialog::PickSchemeDialog(const QString &text, const QList<SchemeWidget *> &schemes, QWidget *parent)
+SelectSchemeDialog::SelectSchemeDialog(const QString &text, const QList<SchemeWidget *> &schemes, QWidget *parent)
     : QDialog(parent),
-      m_model(new PickSchemeModel(schemes, this))
+      m_model(new SelectSchemeModel(schemes, this))
 {
     setWindowModality(Qt::ApplicationModal);
 
@@ -22,9 +22,9 @@ PickSchemeDialog::PickSchemeDialog(const QString &text, const QList<SchemeWidget
     view->setModel(m_model);
 
     QDialogButtonBox * const box = new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel);
-    connect(box->button(QDialogButtonBox::Yes), &QPushButton::clicked, this, &PickSchemeDialog::yes);
-    connect(box->button(QDialogButtonBox::No), &QPushButton::clicked, this, &PickSchemeDialog::none);
-    connect(box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &PickSchemeDialog::cancel);
+    connect(box->button(QDialogButtonBox::Yes), &QPushButton::clicked, this, &SelectSchemeDialog::yes);
+    connect(box->button(QDialogButtonBox::No), &QPushButton::clicked, this, &SelectSchemeDialog::none);
+    connect(box->button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &SelectSchemeDialog::cancel);
 
     QBoxLayout * const layout = new QVBoxLayout(this);
     layout->addWidget(label);
@@ -32,30 +32,30 @@ PickSchemeDialog::PickSchemeDialog(const QString &text, const QList<SchemeWidget
     layout->addWidget(box);
 
     QSettings settings;
-    restoreGeometry(settings.value("PickSchemeDialog/Geometry").toByteArray());
+    restoreGeometry(settings.value("SelectSchemeDialog/Geometry").toByteArray());
 }
 
-void PickSchemeDialog::yes()
+void SelectSchemeDialog::yes()
 {
     emit schemesSelected(m_model->selectedSchemes());
     accept();
 }
 
-void PickSchemeDialog::none()
+void SelectSchemeDialog::none()
 {
     emit schemesSelected(QList<SchemeWidget *>());
     accept();
 }
 
-void PickSchemeDialog::cancel()
+void SelectSchemeDialog::cancel()
 {
     reject();
 }
 
-void PickSchemeDialog::hideEvent(QHideEvent *event)
+void SelectSchemeDialog::hideEvent(QHideEvent *event)
 {
     QSettings settings;
-    settings.setValue("PickSchemeDialog/Geometry", saveGeometry());
+    settings.setValue("SelectSchemeDialog/Geometry", saveGeometry());
 
     QDialog::hideEvent(event);
 }

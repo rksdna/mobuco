@@ -2,7 +2,7 @@
 #define SCHEMEMODEL_H
 
 #include <QAbstractTableModel>
-#include "SchemeEntry.h"
+#include "SchemeItem.h"
 
 class SchemeModel : public QAbstractTableModel
 {
@@ -26,7 +26,7 @@ private:
     int count() const;
 
 private:
-    QList<SchemeEntry> m_entries;
+    QList<SchemeItem> m_entries;
 };
 
 #endif // SCHEMEMODEL_H

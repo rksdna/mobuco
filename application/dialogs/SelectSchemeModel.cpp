@@ -1,21 +1,21 @@
 #include <QIcon>
 #include "SchemeWidget.h"
-#include "PickSchemeModel.h"
+#include "SelectSchemeModel.h"
 
-PickSchemeModel::PickSchemeModel(const QList<SchemeWidget *> &schemes, QObject *parent)
+SelectSchemeModel::SelectSchemeModel(const QList<SchemeWidget *> &schemes, QObject *parent)
     : QAbstractListModel(parent)
 {
     foreach (SchemeWidget *scheme, schemes)
         m_schemes.insert(scheme, true);
 }
 
-int PickSchemeModel::rowCount(const QModelIndex &parent) const
+int SelectSchemeModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
     return m_schemes.count();
 }
 
-QVariant PickSchemeModel::data(const QModelIndex &index, int role) const
+QVariant SelectSchemeModel::data(const QModelIndex &index, int role) const
 {
     SchemeWidget * const key = m_schemes.keys().at(index.row());
 
@@ -37,7 +37,7 @@ QVariant PickSchemeModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool PickSchemeModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool SelectSchemeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     SchemeWidget * const key = m_schemes.keys().at(index.row());
 
@@ -51,17 +51,17 @@ bool PickSchemeModel::setData(const QModelIndex &index, const QVariant &value, i
     return false;
 }
 
-Qt::ItemFlags PickSchemeModel::flags(const QModelIndex &index) const
+Qt::ItemFlags SelectSchemeModel::flags(const QModelIndex &index) const
 {
     return index.isValid() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable : Qt::NoItemFlags;
 }
 
-QList<SchemeWidget *> PickSchemeModel::schemes() const
+QList<SchemeWidget *> SelectSchemeModel::schemes() const
 {
     return m_schemes.keys();
 }
 
-QList<SchemeWidget *> PickSchemeModel::selectedSchemes() const
+QList<SchemeWidget *> SelectSchemeModel::selectedSchemes() const
 {
     return m_schemes.keys(true);
 }

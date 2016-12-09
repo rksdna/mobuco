@@ -29,12 +29,10 @@ private slots:
     void closeFile();
     void closeFileByIndex(int index);
     void closeAllFiles();
-    void insertEntry();
-    void removeEntries();
-    void moveEntriesToTop();
-    void moveEntriesUp();
-    void moveEntriesDown();
-    void moveEntriesToBottom();
+    void insertItem();
+    void removeItems();
+    void moveItemsUp();
+    void moveItemsDown();
     void about();
     void updateTabHeader(SchemeWidget *scheme);
     void updateWindowHeader();
@@ -43,23 +41,31 @@ private slots:
     void querySchemesForSave();
     void setSchemesForSave(const QList<SchemeWidget *> &schemes);
     void querySchemeFileName();
-    void setSchemeFileName(const QString &fileName);
+    void setFileName(const QString &fileName);
     void saveThenCloseSchemes();
 
 private:
     void appendScheme(SchemeWidget *scheme);
     void saveSchemes(const QList<SchemeWidget *> &schemes, bool askFileName);
     void closeSchemes(const QList<SchemeWidget *> &schemes, bool exitAfterClose);
-    QList<SchemeWidget *> allSchemes() const;
-    SchemeWidget *schemeByIndex(int index) const;
+    QList<SchemeWidget *> schemes() const;
+    SchemeWidget *schemeAt(int index) const;
+
+private:
+    struct SaveCloseContext
+    {
+        SaveCloseContext();
+        void setSchemesForSave(const QList<SchemeWidget *> &schemes, bool askFileName);
+        QList<SchemeWidget *> modifiedSchemes() const;
+        SchemeWidget *schemeForSave() const;
+        QList<SchemeWidget *> forClose;
+        QHash<SchemeWidget *, QString> schemesForSave;
+        bool exitAfterClose;
+    };
 
 private:
     QTabWidget * const m_widget;
-    QList<SchemeWidget *> m_schemesForClose;
-    QList<SchemeWidget *> m_schemesForSave;
-    QHash<SchemeWidget *, QString> m_schemes;
-    bool m_askFileName;
-    bool m_exitAfterClose;
+    SaveCloseContext m_context;
 };
 
 #endif // MAINWINDOW_H

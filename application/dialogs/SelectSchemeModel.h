@@ -1,16 +1,16 @@
-#ifndef PICKSCHEMEMODEL_H
-#define PICKSCHEMEMODEL_H
+#ifndef SELECTSCHEMEMODEL_H
+#define SELECTSCHEMEMODEL_H
 
 #include <QMap>
 #include <QAbstractTableModel>
 
 class SchemeWidget;
 
-class PickSchemeModel : public QAbstractListModel
+class SelectSchemeModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit PickSchemeModel(const QList<SchemeWidget *> &schemes, QObject *parent = 0);
+    explicit SelectSchemeModel(const QList<SchemeWidget *> &schemes, QObject *parent = 0);
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role);
@@ -23,4 +23,4 @@ private:
     QMap<SchemeWidget *, bool> m_schemes;
 };
 
-#endif // PICKSCHEMEMODEL_H
+#endif // SELECTSCHEMEMODEL_H

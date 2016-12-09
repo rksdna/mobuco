@@ -81,12 +81,12 @@ bool SchemeWidget::saveToFile(const QString &fileName)
     return true;
 }
 
-void SchemeWidget::insertEntry()
+void SchemeWidget::insertItem()
 {
     m_model->insertRow(m_model->rowCount());
 }
 
-void SchemeWidget::removeEntries()
+void SchemeWidget::removeItems()
 {
     QModelIndexList indexes = m_view->selectionModel()->selectedRows();
     if (!indexes.isEmpty())
@@ -96,29 +96,23 @@ void SchemeWidget::removeEntries()
     }
 }
 
-void SchemeWidget::moveEntries(Move move)
+void SchemeWidget::moveItemsUp()
 {
     QModelIndexList indexes = m_view->selectionModel()->selectedRows();
     if (!indexes.isEmpty())
     {
         qSort(indexes);
-        switch (move)
-        {
-        case SchemeWidget::MoveToTop:
-            m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), 0);
-            break;
-        case SchemeWidget::MoveUp:
-            m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), indexes.first().row() - 1);
-            break;
-        case SchemeWidget::MoveDown:
-            m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), indexes.last().row() + 2);
-            break;
-        case SchemeWidget::MoveToBottom:
-            m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), m_model->rowCount());
-            break;
-        default:
-            break;
-        }
+        m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), indexes.first().row() - 1);
+    }
+}
+
+void SchemeWidget::moveItemsDown()
+{
+    QModelIndexList indexes = m_view->selectionModel()->selectedRows();
+    if (!indexes.isEmpty())
+    {
+        qSort(indexes);
+        m_model->moveRows(QModelIndex(), indexes.first().row(), indexes.count(), QModelIndex(), indexes.last().row() + 2);
     }
 }
 

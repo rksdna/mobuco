@@ -11,24 +11,16 @@ class SchemeWidget : public QWidget
 {
     Q_OBJECT
 public:
-    enum Move
-    {
-        MoveToTop,
-        MoveUp,
-        MoveDown,
-        MoveToBottom
-    };
-
-public:
     explicit SchemeWidget(const QString &fileName, QWidget *parent = 0);
     QString fileName() const;
     bool isNew() const;
     bool isModified() const;
     bool loadFromFile(const QString &fileName);
     bool saveToFile(const QString &fileName);
-    void insertEntry();
-    void removeEntries();
-    void moveEntries(Move move);
+    void insertItem();
+    void removeItems();
+    void moveItemsUp();
+    void moveItemsDown();
 
 signals:
     void statusChanged(SchemeWidget *scheme);

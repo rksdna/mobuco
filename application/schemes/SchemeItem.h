@@ -1,5 +1,5 @@
-#ifndef SCHEMEENTRY_H
-#define SCHEMEENTRY_H
+#ifndef SCHEMEITEM_H
+#define SCHEMEITEM_H
 
 #include <QVector>
 #include <QVariant>
@@ -7,10 +7,10 @@
 class Delegate;
 class QJsonObject;
 
-class SchemeEntry
+class SchemeItem
 {
 public:
-    SchemeEntry(int size = 2);
+    SchemeItem(int size = 2);
     int count() const;
     QVariant value(int column) const;
     bool setValue(int column, const QVariant &value);
@@ -23,4 +23,4 @@ private:
     QVector<int> m_data;
 };
 
-#endif // SCHEMEENTRY_H
+#endif // SCHEMEITEM_H
