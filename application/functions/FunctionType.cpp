@@ -4,7 +4,7 @@ FunctionType::FunctionType(int code, const QString &title)
     : m_code(code),
       m_title(title)
 {
-    FunctionFactory::instance()->append(this);
+    types().insert(code, this);
 }
 
 int FunctionType::code() const
@@ -17,27 +17,8 @@ QString FunctionType::title() const
     return m_title;
 }
 
-FunctionFactory *FunctionFactory::instance()
+FunctionType::Hash &FunctionType::types()
 {
-    static FunctionFactory factory;
-    return &factory;
-}
-
-FunctionFactory::FunctionFactory()
-{
-}
-
-QList<int> FunctionFactory::codes() const
-{
-    return m_types.keys();
-}
-
-const FunctionType *FunctionFactory::type(int code) const
-{
-    return m_types.value(code);
-}
-
-void FunctionFactory::append(const FunctionType *type)
-{
-    m_types.insert(type->code(), type);
+    static Hash types;
+    return types;
 }

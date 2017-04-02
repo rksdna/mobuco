@@ -8,16 +8,16 @@ SchemeDelegate::SchemeDelegate(QObject *parent) :
 
 QWidget *SchemeDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
+    Delegate::Pointer const delegate = index.data(Qt::UserRole).value<Delegate::Pointer>();
     if (delegate)
-        return delegate->createWidget(parent);
+        return delegate->createEditor(parent);
 
     return QItemDelegate::createEditor(parent, option, index);
 }
 
 void SchemeDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) const
 {
-    DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
+    Delegate::Pointer const delegate = index.data(Qt::UserRole).value<Delegate::Pointer>();
     if (delegate)
         return delegate->destroyEditor(editor);
 
@@ -26,7 +26,7 @@ void SchemeDelegate::destroyEditor(QWidget *editor, const QModelIndex &index) co
 
 void SchemeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
+    Delegate::Pointer const delegate = index.data(Qt::UserRole).value<Delegate::Pointer>();
     if (delegate)
         delegate->setEditorData(editor, index.data(Qt::EditRole));
     else
@@ -35,7 +35,7 @@ void SchemeDelegate::setEditorData(QWidget *editor, const QModelIndex &index) co
 
 void SchemeDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    DelegateSharedPointer const delegate = index.data(Qt::UserRole).value<DelegateSharedPointer>();
+    Delegate::Pointer const delegate = index.data(Qt::UserRole).value<Delegate::Pointer>();
     if (delegate)
         model->setData(index, delegate->editorData(editor), Qt::EditRole);
     else

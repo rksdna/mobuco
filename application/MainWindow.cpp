@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(m_widget);
 
-    // debug
+#warning "Fix me"
     QIcon::setThemeName("Mint-X");
 
     m_widget->setTabsClosable(true);

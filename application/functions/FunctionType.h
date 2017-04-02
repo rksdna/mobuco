@@ -2,17 +2,23 @@
 #define FUNCTIONTYPE_H
 
 #include <QHash>
-
-class Function;
+#include "Function.h"
 
 class FunctionType
 {
+public:
+    typedef const FunctionType *Pointer;
+    typedef QHash<int, Pointer> Hash;
+
+public:
+    static Hash &types();
+
 public:
     FunctionType(int code, const QString &title);
     int code() const;
     QString title() const;
 
-    virtual Function *create() const = 0;
+    virtual Function::Pointer create() const = 0;
 
 private:
     const int m_code;
@@ -28,28 +34,10 @@ public:
     {
     }
 
-    Function *create() const
+    Function::Pointer create() const
     {
-        return new CustomFunction;
+        return Function::Pointer(new CustomFunction);
     }
-};
-
-class FunctionFactory
-{
-public:
-    static FunctionFactory *instance();
-
-public:
-    QList<int> codes() const;
-    const FunctionType *type(int code) const;
-    void append(const FunctionType *type);
-
-private:
-    FunctionFactory();
-    Q_DISABLE_COPY(FunctionFactory)
-
-private:
-    QHash<int, const FunctionType *> m_types;
 };
 
 #endif // FUNCTIONTYPE_H

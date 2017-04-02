@@ -1,59 +1,63 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "SchemeItem.h"
-#include "EnumerationDelegate.h"
+#include "FunctionType.h"
+#include "DefaultDelegate.h"
+#include "FunctionDelegate.h"
 
-SchemeItem::SchemeItem(int size)
-    : m_data(size)
+SchemeItem::SchemeItem()
+    : m_function(create(0x00))
 {
 }
 
 int SchemeItem::count() const
 {
-    return m_data.count();
+    return FixedColumnCount;
 }
 
-QVariant SchemeItem::value(int column) const
+QVariant SchemeItem::data(int column) const
 {
-    return m_data.value(column, -200);
+    if (column == CodeColumn)
+        return m_function->type().code();
+
+    return QVariant();
 }
 
-bool SchemeItem::setValue(int column, const QVariant &value)
+bool SchemeItem::setData(int column, const QVariant &value)
 {
-    m_data[column] = value.toInt();
-    return true;
+    if (column == CodeColumn)
+    {
+        m_function = create(value.toInt());
+        return true;
+    }
+
+    return false;
 }
 
-QVariant SchemeItem::delegate(int column) const
+Delegate::Pointer SchemeItem::delegate(int column) const
 {
-    static DelegateSharedPointer da(new EnumerationDelegate("A;B;C"));
-    static DelegateSharedPointer db(new EnumerationDelegate("q;w;e"));
+    if (column == CodeColumn)
+        return Delegate::shared<FunctionDelegate>();
 
-    if (column == 0)
-        return QVariant::fromValue(DelegateSharedPointer(new EnumerationDelegate("r;t;y")));
-
-    if (column % 2 == 0)
-        return QVariant::fromValue(da);
-
-    return QVariant::fromValue(db);
+    return Delegate::shared<DefaultDelegate>();
 }
 
 void SchemeItem::readFromJson(const QJsonObject &object)
 {
-    QJsonArray data = object["data"].toArray();
-
-    m_data.resize(data.count());
-    for (int i = 0; i < m_data.count(); i++)
-        m_data[i] = data.at(i).toInt();
+    m_function = create(object["function"].toInt());
 }
 
 QJsonObject SchemeItem::writeToJson() const
 {
-    QJsonArray data;
-    for (int i = 0; i < m_data.count(); i++)
-        data.append(m_data.at(i));
-
     QJsonObject object;
-    object["data"] = data;
+    object["function"] = m_function->type().code();
+
     return object;
+}
+
+Function::Pointer SchemeItem::create(int code)
+{
+    const FunctionType::Pointer type = FunctionType::types().value(code);
+#warning "Fix me"
+    return type ? type->create() : Function::Pointer();
 }

@@ -25,15 +25,20 @@ int SchemeModel::columnCount(const QModelIndex &parent) const
 QVariant SchemeModel::data(const QModelIndex &index, int role) const
 {
     const SchemeItem &item = m_items.at(index.row());
+    const Delegate::Pointer delegate = item.delegate(index.column());
+    const QVariant value = item.data(index.column());
 
     if (role == Qt::DisplayRole)
-        return item.value(index.column());
+        return delegate->display(value);
+
+    if (role == Qt::DecorationRole)
+        return delegate->decoration(value);
 
     if (role == Qt::EditRole)
-        return item.value(index.column());
+        return value;
 
     if (role == Qt::UserRole)
-        return item.delegate(index.column());
+        return QVariant::fromValue(delegate);
 
     return QVariant();
 }
@@ -44,7 +49,7 @@ bool SchemeModel::setData(const QModelIndex &index, const QVariant &value, int r
 
     if (role == Qt::EditRole)
     {
-        if (item.setValue(index.column(), value))
+        if (item.setData(index.column(), value))
         {
             updateColumnCount(index.parent());
             emit dataChanged(index, index);
@@ -62,8 +67,11 @@ QVariant SchemeModel::headerData(int section, Qt::Orientation orientation, int r
 
 Qt::ItemFlags SchemeModel::flags(const QModelIndex &index) const
 {
-    Q_UNUSED(index)
-    return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    const SchemeItem &item = m_items.at(index.row());
+    const Delegate::Pointer delegate = item.delegate(index.column());
+
+    return delegate->isEditable() ? Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable :
+                                    Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 bool SchemeModel::insertRows(int row, int count, const QModelIndex &parent)

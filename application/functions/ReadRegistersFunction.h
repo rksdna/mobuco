@@ -6,7 +6,7 @@
 class ReadRegistersFunction : public Function
 {
 public:
-    ReadRegistersFunction(const FunctionType *type);
+    ReadRegistersFunction(const FunctionType &type);
 };
 
 class ReadHoldingRegistersFunction : public ReadRegistersFunction

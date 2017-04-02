@@ -19,7 +19,6 @@ SOURCES += \
     main.cpp \
     MainWindow.cpp \
     delegates/Delegate.cpp \
-    delegates/EnumerationDelegate.cpp \
     schemes/SchemeDelegate.cpp \
     schemes/SchemeModel.cpp \
     schemes/SchemeWidget.cpp \
@@ -30,12 +29,13 @@ SOURCES += \
     schemes/SchemeItem.cpp \
     functions/Function.cpp \
     functions/ReadRegistersFunction.cpp \
-    functions/FunctionType.cpp
+    functions/FunctionType.cpp \
+    delegates/FunctionDelegate.cpp \
+    delegates/DefaultDelegate.cpp
 
 HEADERS += \
     MainWindow.h \
     delegates/Delegate.h \
-    delegates/EnumerationDelegate.h \
     schemes/SchemeDelegate.h \
     schemes/SchemeWidget.h \
     schemes/SchemeModel.h \
@@ -46,7 +46,9 @@ HEADERS += \
     schemes/SchemeItem.h \
     functions/Function.h \
     functions/ReadRegistersFunction.h \
-    functions/FunctionType.h
+    functions/FunctionType.h \
+    delegates/FunctionDelegate.h \
+    delegates/DefaultDelegate.h
 
 RESOURCES += \
     application.qrc
