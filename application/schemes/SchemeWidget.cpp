@@ -27,7 +27,6 @@ SchemeWidget::SchemeWidget(const QString &fileName, QWidget *parent)
     m_view->setSelectionMode(QTableView::ContiguousSelection);
 
     m_view->horizontalHeader()->setHighlightSections(false);
-    m_view->horizontalHeader()->setStretchLastSection(true);
     m_view->setAlternatingRowColors(true);
     m_view->setModel(m_model);
 

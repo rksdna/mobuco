@@ -104,8 +104,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QMenu * const editMenu = menuBar()->addMenu(tr("Edit"));
 
-    QAction * const insertAction = editMenu->addAction(QIcon::fromTheme("list-add"), tr("Add"));
-    connect(insertAction, &QAction::triggered, this, &MainWindow::insertItem);
+    QAction * const appendAction = editMenu->addAction(QIcon::fromTheme("list-add"), tr("Append"));
+    connect(appendAction, &QAction::triggered, this, &MainWindow::insertItem);
 
     editMenu->addSeparator();
 

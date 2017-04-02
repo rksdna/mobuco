@@ -12,7 +12,8 @@ target.path = $$DEPLOY_BIN_DIR
 INCLUDEPATH += \
     schemes \
     dialogs \
-    delegates
+    delegates \
+    functions
 
 SOURCES += \
     main.cpp \
@@ -26,7 +27,10 @@ SOURCES += \
     dialogs/SaveSchemeDialog.cpp \
     dialogs/SelectSchemeModel.cpp \
     dialogs/SelectSchemeDialog.cpp \
-    schemes/SchemeItem.cpp
+    schemes/SchemeItem.cpp \
+    functions/Function.cpp \
+    functions/ReadRegistersFunction.cpp \
+    functions/FunctionType.cpp
 
 HEADERS += \
     MainWindow.h \
@@ -39,7 +43,10 @@ HEADERS += \
     dialogs/SaveSchemeDialog.h \
     dialogs/SelectSchemeDialog.h \
     dialogs/SelectSchemeModel.h \
-    schemes/SchemeItem.h
+    schemes/SchemeItem.h \
+    functions/Function.h \
+    functions/ReadRegistersFunction.h \
+    functions/FunctionType.h
 
 RESOURCES += \
     application.qrc

@@ -23,10 +23,12 @@ public:
     QJsonDocument writeToJson() const;
 
 private:
-    int count() const;
+    void updateColumnCount(const QModelIndex &index);
+    int actualColumnCount() const;
 
 private:
-    QList<SchemeItem> m_entries;
+    QList<SchemeItem> m_items;
+    int m_columnCount;
 };
 
 #endif // SCHEMEMODEL_H

@@ -5,50 +5,48 @@
 #include "SchemeModel.h"
 
 SchemeModel::SchemeModel(QObject *parent) :
-    QAbstractTableModel(parent)
+    QAbstractTableModel(parent),
+    m_columnCount(0)
 {
-    m_entries.append(SchemeItem(0));
-    m_entries.append(SchemeItem(1));
-    m_entries.append(SchemeItem(2));
-    m_entries.append(SchemeItem(3));
 }
 
 int SchemeModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return m_entries.count();
+    return m_items.count();
 }
 
 int SchemeModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return count();
+    return m_columnCount;
 }
 
 QVariant SchemeModel::data(const QModelIndex &index, int role) const
 {
-    const SchemeItem &entry = m_entries.at(index.row());
+    const SchemeItem &item = m_items.at(index.row());
 
     if (role == Qt::DisplayRole)
-        return entry.value(index.column());
+        return item.value(index.column());
 
     if (role == Qt::EditRole)
-        return entry.value(index.column());
+        return item.value(index.column());
 
     if (role == Qt::UserRole)
-        return entry.delegate(index.column());
+        return item.delegate(index.column());
 
     return QVariant();
 }
 
 bool SchemeModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    SchemeItem &entry = m_entries[index.row()];
+    SchemeItem &item = m_items[index.row()];
 
     if (role == Qt::EditRole)
     {
-        if (entry.setValue(index.column(), value))
+        if (item.setValue(index.column(), value))
         {
+            updateColumnCount(index.parent());
             emit dataChanged(index, index);
             return true;
         }
@@ -74,8 +72,11 @@ bool SchemeModel::insertRows(int row, int count, const QModelIndex &parent)
 
     beginInsertRows(parent, row, row + count - 1);
     while (count--)
-        m_entries.insert(row, SchemeItem());
+        m_items.insert(row, SchemeItem());
+
+    updateColumnCount(parent);
     endInsertRows();
+
     return true;
 }
 
@@ -85,8 +86,11 @@ bool SchemeModel::removeRows(int row, int count, const QModelIndex &parent)
 
     beginRemoveRows(parent, row, row + count - 1);
     while (count--)
-        m_entries.removeAt(row);
+        m_items.removeAt(row);
+
+    updateColumnCount(parent);
     endRemoveRows();
+
     return true;
 }
 
@@ -102,13 +106,13 @@ bool SchemeModel::moveRows(const QModelIndex &sourceParent, int sourceRow, int c
     if (destinationChild < sourceRow)
     {
         while (count--)
-            m_entries.move(sourceRow++, destinationChild++);
+            m_items.move(sourceRow++, destinationChild++);
     }
     else
     {
         sourceRow += count;
         while (count--)
-            m_entries.move(--sourceRow, --destinationChild);
+            m_items.move(--sourceRow, --destinationChild);
     }
     endMoveRows();
 
@@ -119,13 +123,15 @@ void SchemeModel::readFromJson(const QJsonDocument &document)
 {
     beginResetModel();
 
-    m_entries.clear();
+    m_items.clear();
     foreach (const QJsonValue &value, document.array())
     {
-        SchemeItem entry;
-        entry.readFromJson(value.toObject());
-        m_entries.append(entry);
+        SchemeItem item;
+        item.readFromJson(value.toObject());
+        m_items.append(item);
     }
+
+    m_columnCount = actualColumnCount();
 
     endResetModel();
 }
@@ -133,17 +139,36 @@ void SchemeModel::readFromJson(const QJsonDocument &document)
 QJsonDocument SchemeModel::writeToJson() const
 {
     QJsonArray array;
-    foreach (const SchemeItem &entry, m_entries)
-        array.append(entry.writeToJson());
+    foreach (const SchemeItem &item, m_items)
+        array.append(item.writeToJson());
 
     return QJsonDocument(array);
 }
 
-int SchemeModel::count() const
+void SchemeModel::updateColumnCount(const QModelIndex &index)
+{
+    const int count = actualColumnCount();
+
+    if (count > m_columnCount)
+    {
+        beginInsertColumns(index, m_columnCount, count - 1);
+        m_columnCount = count;
+        endInsertColumns();
+    }
+
+    if (count < m_columnCount)
+    {
+        beginRemoveColumns(index, count, m_columnCount - 1);
+        m_columnCount = count;
+        endRemoveColumns();
+    }
+}
+
+int SchemeModel::actualColumnCount() const
 {
     int count = 0;
-    foreach (const SchemeItem &entry, m_entries)
-        count = qMax(count, entry.count());
+    foreach (const SchemeItem &item, m_items)
+        count = qMax(count, item.count());
 
     return count;
 }
